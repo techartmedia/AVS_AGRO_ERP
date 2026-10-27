@@ -827,7 +827,7 @@
         <div class="grid grid-cols-2 gap-3">
           <div>
             <label class="block font-semibold text-slate-700 mb-1">HSN Code *</label>
-            <input type="text" id="prdHsn" value="8436" required class="w-full px-3 py-2 border rounded-lg font-mono focus:outline-none focus:ring-1 focus:ring-amber-500">
+            <input type="text" id="prdHsn" value="" required class="w-full px-3 py-2 border rounded-lg font-mono focus:outline-none focus:ring-1 focus:ring-amber-500">
           </div>
           <div>
             <label class="block font-semibold text-slate-700 mb-1">Standard Unit Rate (₹) *</label>
@@ -1931,13 +1931,13 @@
         const p = appState.products.find(x => x.id === id);
         if (p) {
           document.getElementById('prdName').value = p.name || '';
-          document.getElementById('prdHsn').value = p.hsn || '8436';
+          document.getElementById('prdHsn').value = p.hsn || '';
           document.getElementById('prdRate').value = p.rate || '';
           document.getElementById('prdSpecs').value = p.specs || '';
         }
       } else {
         document.getElementById('prdName').value = '';
-        document.getElementById('prdHsn').value = '8436';
+        document.getElementById('prdHsn').value = '';
         document.getElementById('prdRate').value = '';
         document.getElementById('prdSpecs').value = '';
       }
@@ -1949,7 +1949,7 @@
       const id = document.getElementById('productFormId').value;
       const productData = {
         name: document.getElementById('prdName').value.trim(),
-        hsn: document.getElementById('prdHsn').value.trim() || '8436',
+        hsn: document.getElementById('prdHsn').value.trim() || '',
         rate: Number(document.getElementById('prdRate').value) || 0,
         specs: document.getElementById('prdSpecs').value.trim()
       };
@@ -2464,7 +2464,7 @@
           ${prdOptions}
         </select>
         <input type="text" placeholder="Description / Specs" id="idesc-${rowId}" class="flex-1 px-2.5 py-1.5 border rounded-lg text-xs">
-        <input type="text" value="8436" placeholder="HSN" id="ihsn-${rowId}" class="w-16 px-2.5 py-1.5 border rounded-lg text-xs font-mono text-center">
+        <input type="text" value="" placeholder="HSN" id="ihsn-${rowId}" class="w-16 px-2.5 py-1.5 border rounded-lg text-xs font-mono text-center">
         <input type="number" value="1" min="1" oninput="calculateInvoiceTotals()" id="iqty-${rowId}" class="w-14 px-2.5 py-1.5 border rounded-lg text-xs font-mono text-center">
         <input type="number" placeholder="Rate" min="0" oninput="calculateInvoiceTotals()" id="irate-${rowId}" class="w-24 px-2.5 py-1.5 border rounded-lg text-xs font-mono text-right">
         <button type="button" onclick="removeInvoiceRow('${rowId}')" class="text-rose-500 hover:text-rose-700 px-1 font-bold text-sm">&times;</button>
@@ -2521,7 +2521,7 @@
       document.querySelectorAll('.inv-line-row').forEach(row => {
         const id = row.id.replace('irow-', '');
         const desc = document.getElementById(`idesc-${id}`)?.value || 'Machinery Line';
-        const hsn = document.getElementById(`ihsn-${id}`)?.value || '8436';
+        const hsn = document.getElementById(`ihsn-${id}`)?.value || '';
         const qty = Number(document.getElementById(`iqty-${id}`)?.value) || 1;
         const rate = Number(document.getElementById(`irate-${id}`)?.value) || 0;
         if (qty > 0) {
@@ -2865,7 +2865,7 @@
         <tr>
           <td style="text-align: center; font-family: monospace;">${idx + 1}</td>
           <td><strong>${itm.desc}</strong></td>
-          <td style="text-align: center; font-family: monospace;">${itm.hsn || '8436'}</td>
+          <td style="text-align: center; font-family: monospace;">${itm.hsn || ''}</td>
           <td style="text-align: center; font-family: monospace;">${itm.qty}</td>
           <td style="text-align: right; font-family: monospace;">₹${Number(itm.rate).toLocaleString('en-IN')}</td>
           <td style="text-align: right; font-family: monospace; font-weight: 700;">₹${Number(itm.amount).toLocaleString('en-IN')}</td>
