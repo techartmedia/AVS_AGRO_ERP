@@ -6,6 +6,8 @@
   <title>AVS Agro Engineers - ERP System</title>
   <!-- Tailwind CSS CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Supabase JS Client for Multi-Device Realtime Sync -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <!-- html2pdf.js for client-side document export -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 
@@ -203,7 +205,7 @@
     <!-- ================= MAIN WORKSPACE ================= -->
     <div class="flex-1 flex flex-col min-w-0 overflow-y-auto">
 
-      <!-- Top Header Navigation (Clean, single toggle, no date/readiness clutter) -->
+      <!-- Top Header Navigation -->
       <header class="h-16 bg-white border-b border-slate-200 px-6 flex items-center justify-between sticky top-0 z-20 shadow-sm">
         <div class="flex items-center gap-4">
           <button onclick="toggleSidebar()" class="p-2 rounded-lg text-slate-700 hover:bg-slate-100 transition" title="Toggle Sidebar">
@@ -222,6 +224,12 @@
         </div>
 
         <div class="flex items-center gap-3">
+          <!-- Realtime Cloud Sync Badge -->
+          <div id="cloudSyncBadge" class="hidden sm:flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200">
+            <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+            <span id="cloudSyncText">Supabase Sync Active</span>
+          </div>
+
           <!-- Quick Action Dropdown -->
           <div class="relative">
             <button onclick="toggleQuickMenu()" class="px-3.5 py-1.5 bg-amber-500 hover:bg-amber-600 text-slate-950 rounded-lg text-xs font-bold flex items-center gap-1.5 shadow-sm transition">
@@ -276,7 +284,6 @@
                 <img src="./Logo.jpg" alt="AVS Agro" class="h-full w-full object-contain rounded-lg" onerror="this.onerror=null; this.parentElement.innerHTML='<span class=\'font-black text-amber-400 text-base\'>AVS</span>';" />
               </div>
               <div>
-              
                 <h2 class="text-xl font-black tracking-tight text-white mt-1" id="dashHeroTitle">AVS AGRO ENGINEERS</h2>
                 <p class="text-xs text-slate-300 mt-0.5" id="dashHeroAddress">Malegaon Road, Near Siddhi Auto, Satana, Tal. Baglan, Dist. Nashik, Maharashtra - 423301</p>
               </div>
@@ -826,7 +833,7 @@
         <div class="grid grid-cols-2 gap-3">
           <div>
             <label class="block font-semibold text-slate-700 mb-1">HSN Code *</label>
-            <input type="text" id="prdHsn" value="" required class="w-full px-3 py-2 border rounded-lg font-mono focus:outline-none focus:ring-1 focus:ring-amber-500">
+            <input type="text" id="prdHsn" value="8436" required class="w-full px-3 py-2 border rounded-lg font-mono focus:outline-none focus:ring-1 focus:ring-amber-500">
           </div>
           <div>
             <label class="block font-semibold text-slate-700 mb-1">Standard Unit Rate (₹) *</label>
@@ -1398,7 +1405,7 @@
           <div style="display: flex; justify-content: space-between; align-items: flex-start;">
             <div style="display: flex; align-items: center; gap: 14px;">
               <div style="width: 60px; height: 60px; border-radius: 8px; background: rgba(245, 158, 11, 0.1); border: 1px solid rgba(217, 119, 6, 0.3); overflow: hidden; display: flex; align-items: center; justify-content: center; padding: 2px;">
-                <img src="./Logo.jpg" style="width: 100%; height: 100%; object-contain: contain;" onerror="this.onerror=null; this.parentElement.innerHTML='<span style=\\'font-weight:900; font-size:16px; color:#d97706;\\'>AVS</span>';" />
+                <img src="./Logo.jpg" style="width: 100%; height: 100%; object-fit: contain;" onerror="this.onerror=null; this.parentElement.innerHTML='<span style=\\'font-weight:900; font-size:16px; color:#d97706;\\'>AVS</span>';" />
               </div>
               <div>
                 <div style="font-size: 18px; font-weight: 900; color: #0f172a; line-height: 1.1; letter-spacing: 0.5px;">${s.companyName}</div>
@@ -1423,6 +1430,26 @@
         </div>
       `;
     }
+
+    // Official Bank Coordinates Footer for Documents
+    function getBankDetailsFooterHtml() {
+      const s = appState.settings;
+      return `
+        <div style="margin-top: 24px; border-top: 1px solid #cbd5e1; padding-top: 12px; display: flex; justify-content: space-between; align-items: flex-end; font-size: 10.5px; color: #334155;">
+          <div>
+            <div style="font-weight: 800; color: #0f172a; text-transform: uppercase; margin-bottom: 3px;">Bank Details for RTGS / NEFT / IMPS:</div>
+            <div>Bank: <strong>${s.bankName}</strong></div>
+            <div>A/C Name: <strong>${s.companyName}</strong></div>
+            <div style="font-family: monospace;">A/C No: <strong>${s.bankAcc}</strong> | IFSC: <strong>${s.bankIfsc}</strong></div>
+          </div>
+          <div style="text-align: right;">
+            <div style="font-weight: 800; color: #0f172a;">For ${s.companyName}</div>
+            <div style="margin-top: 36px; color: #94a3b8; font-size: 9px; text-transform: uppercase; letter-spacing: 0.5px;">Authorized Signatory</div>
+          </div>
+        </div>
+      `;
+    }
+
     // ================= WHATSAPP SHARING ENGINE =================
     function sendWhatsAppDoc(type, number, clientIdentifier, amount, extraMsg = '') {
       const client = resolveClient(clientIdentifier);
@@ -1435,10 +1462,10 @@
         ``,
         `Dear *${client ? client.name : 'Customer'}*,`,
         `Please find the official details of your *${type}* *#${number}*:`,
-        `&bull; *Document:* ${type}`,
-        `&bull; *Reference #:* ${number}`,
-        `&bull; *Total Amount:* Rs. ${formattedAmount}/-`,
-        extraMsg ? `&bull; *Note:* ${extraMsg}` : '',
+        `• *Document:* ${type}`,
+        `• *Reference #:* ${number}`,
+        `• *Total Amount:* Rs. ${formattedAmount}/-`,
+        extraMsg ? `• *Note:* ${extraMsg}` : '',
         ``,
         `*Bank Settlement Details:*`,
         `Bank: ${s.bankName}`,
@@ -1457,11 +1484,9 @@
     }
 
     async function shareActiveDocWhatsApp() {
-      // 1. Trigger automated download of the active document PDF
       downloadActiveDocPDF();
       showToast('PDF downloaded! Opening WhatsApp...');
 
-      // 2. Open WhatsApp with formatted text
       setTimeout(() => {
         sendWhatsAppDoc(
           activeDocContext.type,
@@ -1490,6 +1515,12 @@
     let activeDocFilename = 'document.pdf';
     let currentSelectedClient360Id = null;
 
+    // Supabase Client Handle
+    const SUPABASE_URL = "https://sxwtiqqwvydufcdpevdu.supabase.co";
+    const SUPABASE_KEY = "sb_publishable_05ozgimqRBtFo4-CSrC7yA_mepPMzYu";
+    let supabaseClient = null;
+    let isCloudConnected = false;
+
     function initDatabase() {
       try {
         const stored = localStorage.getItem(DB_KEY);
@@ -1511,12 +1542,68 @@
       } catch (err) {
         console.error('Error loading database', err);
       }
-      persistState();
+      persistState(false);
+      initSupabaseSync();
     }
 
-    function persistState() {
+    async function initSupabaseSync() {
+      try {
+        if (!window.supabase) return;
+        supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+        // Fetch cloud state
+        const { data, error } = await supabaseClient
+          .from('avs_erp_data')
+          .select('state')
+          .eq('id', 'primary_state')
+          .single();
+
+        if (!error && data && data.state && Object.keys(data.state).length > 0) {
+          appState = data.state;
+          localStorage.setItem(DB_KEY, JSON.stringify(appState));
+          refreshAllViews();
+        } else {
+          await supabaseClient
+            .from('avs_erp_data')
+            .upsert({ id: 'primary_state', state: appState });
+        }
+
+        isCloudConnected = true;
+        const syncBadge = document.getElementById('cloudSyncBadge');
+        if (syncBadge) syncBadge.classList.remove('hidden');
+
+        // Realtime Subscription across all devices
+        supabaseClient
+          .channel('public:avs_erp_data')
+          .on('postgres_changes', { event: '*', schema: 'public', table: 'avs_erp_data' }, payload => {
+            if (payload.new && payload.new.state) {
+              appState = payload.new.state;
+              localStorage.setItem(DB_KEY, JSON.stringify(appState));
+              refreshAllViews();
+            }
+          })
+          .subscribe();
+
+      } catch (e) {
+        console.warn("Supabase realtime sync offline mode", e);
+      }
+    }
+
+    function refreshAllViews() {
+      refreshClientDropdowns();
+      renderAllTables();
+      loadAdminSettingsForm();
+    }
+
+    function persistState(syncCloud = true) {
       try {
         localStorage.setItem(DB_KEY, JSON.stringify(appState));
+        if (syncCloud && supabaseClient && isCloudConnected) {
+          supabaseClient
+            .from('avs_erp_data')
+            .upsert({ id: 'primary_state', state: appState, updated_at: new Date() })
+            .catch(err => console.error("Cloud push failed:", err));
+        }
       } catch (e) {
         console.error('Persistence failed', e);
       }
@@ -1557,12 +1644,11 @@
     }
 
     // ================= BULLETPROOF CLIENT RESOLVER =================
-    // Matches by exact ID, or trimmed case-insensitive Name
     function resolveClient(identifier) {
       if (!identifier) return null;
       const cleanVal = String(identifier).trim().toLowerCase();
       return appState.clients.find(c => 
-        (c.id && c.id.trim().toLowerCase() === cleanVal) ||
+        (c.id && c.id.trim().toLowerCase() === cleanVal) || 
         (c.name && c.name.trim().toLowerCase() === cleanVal)
       ) || null;
     }
@@ -1852,7 +1938,7 @@
         }
       } else {
         document.getElementById('prdName').value = '';
-        document.getElementById('prdHsn').value = '';
+        document.getElementById('prdHsn').value = '8436';
         document.getElementById('prdRate').value = '';
         document.getElementById('prdSpecs').value = '';
       }
@@ -1864,7 +1950,7 @@
       const id = document.getElementById('productFormId').value;
       const productData = {
         name: document.getElementById('prdName').value.trim(),
-        hsn: document.getElementById('prdHsn').value.trim() || '',
+        hsn: document.getElementById('prdHsn').value.trim() || '8436',
         rate: Number(document.getElementById('prdRate').value) || 0,
         specs: document.getElementById('prdSpecs').value.trim()
       };
@@ -2203,68 +2289,6 @@
       `).join('');
     }
 
-    function renderInvoicesTable() {
-      const tbody = document.getElementById('invoicesTableBody');
-      if (!appState.invoices.length) {
-        tbody.innerHTML = `<tr><td colspan="8" class="text-center py-6 text-slate-400">No tax invoices generated yet. Click '+ Create Tax Invoice'.</td></tr>`;
-        return;
-      }
-
-      tbody.innerHTML = appState.invoices.map(inv => `
-        <tr class="hover:bg-slate-50 transition">
-          <td class="py-2.5 px-4 font-mono font-bold text-sky-600">${inv.number}</td>
-          <td class="py-2.5 px-4 text-slate-600">${inv.date}</td>
-          <td class="py-2.5 px-4 font-bold text-slate-900">${inv.clientName}</td>
-          <td class="py-2.5 px-4 font-mono">₹${Number(inv.subtotal).toLocaleString('en-IN')}</td>
-          <td class="py-2.5 px-4 font-mono">${inv.gstPercent}%</td>
-          <td class="py-2.5 px-4 font-mono font-bold text-slate-900">₹${Number(inv.total).toLocaleString('en-IN')}</td>
-          <td class="py-2.5 px-4"><span class="px-2 py-0.5 rounded text-[10px] font-bold bg-sky-50 text-sky-700 border border-sky-200">${inv.paymentStatus || 'Billed'}</span></td>
-          <td class="py-2.5 px-4 text-center">
-            <div class="flex items-center justify-center gap-2">
-              <button onclick="previewInvoiceDoc('${inv.number}')" class="text-slate-700 hover:underline font-semibold">View/PDF</button>
-              <button onclick="previewInvoiceDoc('${inv.number}'); setTimeout(shareActiveDocWhatsApp, 400);" class="text-emerald-600 hover:underline font-semibold" title="Send Tax Invoice PDF on WhatsApp">
-                <span>WA</span>
-              </button>
-              <button onclick="deleteInvoice('${inv.number}')" class="text-rose-600 hover:underline font-semibold">Delete</button>
-            </div>
-          </td>
-        </tr>
-      `).join('');
-    }
-
-    function renderPaymentsTable() {
-      const tbody = document.getElementById('paymentsTableBody');
-      const filter = document.getElementById('filterLedgerClient').value;
-      
-      let list = appState.payments;
-      if (filter && filter !== 'ALL') {
-        list = list.filter(p => p.clientId === filter);
-      }
-
-      if (!list.length) {
-        tbody.innerHTML = `<tr><td colspan="8" class="text-center py-6 text-slate-400">No payment records found. Click '+ Record Payment'.</td></tr>`;
-        return;
-      }
-
-      tbody.innerHTML = list.map(p => `
-        <tr class="hover:bg-slate-50 transition">
-          <td class="py-2.5 px-4 font-mono font-bold text-emerald-600">${p.number}</td>
-          <td class="py-2.5 px-4 text-slate-600">${p.date}</td>
-          <td class="py-2.5 px-4"><span class="px-2 py-0.5 rounded text-[10px] font-bold ${p.type.includes('Inward') ? 'bg-emerald-50 text-emerald-700 border border-emerald-200' : 'bg-rose-50 text-rose-700 border border-rose-200'}">${p.type}</span></td>
-          <td class="py-2.5 px-4 font-bold text-slate-900">${p.partyName}</td>
-          <td class="py-2.5 px-4 font-mono font-bold ${p.type.includes('Inward') ? 'text-emerald-600' : 'text-slate-900'}">₹${Number(p.amount).toLocaleString('en-IN')}</td>
-          <td class="py-2.5 px-4 text-slate-600">${p.mode}</td>
-          <td class="py-2.5 px-4 font-mono text-slate-800 bg-slate-50">${p.txnId}</td>
-          <td class="py-2.5 px-4 text-center">
-            <div class="flex items-center justify-center gap-2">
-              <button onclick="sendWhatsAppDoc('PAYMENT RECEIPT', '${p.number}', '${p.clientId || p.partyName}', ${p.amount}, 'Transaction ID: ${p.txnId || 'Verified'}')" class="text-emerald-600 hover:underline font-semibold" title="Send Receipt on WhatsApp">WA</button>
-              <button onclick="deletePayment('${p.number}')" class="text-rose-600 hover:underline font-semibold">Delete</button>
-            </div>
-          </td>
-        </tr>
-      `).join('');
-    }
-
     // ================= SALES ORDERS =================
     function openModalSO() {
       refreshClientDropdowns();
@@ -2441,7 +2465,7 @@
           ${prdOptions}
         </select>
         <input type="text" placeholder="Description / Specs" id="idesc-${rowId}" class="flex-1 px-2.5 py-1.5 border rounded-lg text-xs">
-        <input type="text" value="" placeholder="HSN" id="ihsn-${rowId}" class="w-16 px-2.5 py-1.5 border rounded-lg text-xs font-mono text-center">
+        <input type="text" value="8436" placeholder="HSN" id="ihsn-${rowId}" class="w-16 px-2.5 py-1.5 border rounded-lg text-xs font-mono text-center">
         <input type="number" value="1" min="1" oninput="calculateInvoiceTotals()" id="iqty-${rowId}" class="w-14 px-2.5 py-1.5 border rounded-lg text-xs font-mono text-center">
         <input type="number" placeholder="Rate" min="0" oninput="calculateInvoiceTotals()" id="irate-${rowId}" class="w-24 px-2.5 py-1.5 border rounded-lg text-xs font-mono text-right">
         <button type="button" onclick="removeInvoiceRow('${rowId}')" class="text-rose-500 hover:text-rose-700 px-1 font-bold text-sm">&times;</button>
@@ -2498,7 +2522,7 @@
       document.querySelectorAll('.inv-line-row').forEach(row => {
         const id = row.id.replace('irow-', '');
         const desc = document.getElementById(`idesc-${id}`)?.value || 'Machinery Line';
-        const hsn = document.getElementById(`ihsn-${id}`)?.value || '';
+        const hsn = document.getElementById(`ihsn-${id}`)?.value || '8436';
         const qty = Number(document.getElementById(`iqty-${id}`)?.value) || 1;
         const rate = Number(document.getElementById(`irate-${id}`)?.value) || 0;
         if (qty > 0) {
@@ -2566,7 +2590,10 @@
           <td class="py-2.5 px-4"><span class="px-2 py-0.5 rounded text-[10px] font-bold bg-sky-50 text-sky-700 border border-sky-200">${inv.paymentStatus || 'Billed'}</span></td>
           <td class="py-2.5 px-4 text-center">
             <div class="flex items-center justify-center gap-2">
-              <button onclick="previewInvoiceDoc('${inv.number}')" class="text-slate-700 hover:underline font-semibold">Print</button>
+              <button onclick="previewInvoiceDoc('${inv.number}')" class="text-slate-700 hover:underline font-semibold">View/PDF</button>
+              <button onclick="previewInvoiceDoc('${inv.number}'); setTimeout(shareActiveDocWhatsApp, 400);" class="text-emerald-600 hover:underline font-semibold" title="Send Tax Invoice PDF on WhatsApp">
+                <span>WA</span>
+              </button>
               <button onclick="deleteInvoice('${inv.number}')" class="text-rose-600 hover:underline font-semibold">Delete</button>
             </div>
           </td>
@@ -2742,7 +2769,10 @@
           <td class="py-2.5 px-4 text-slate-600">${p.mode}</td>
           <td class="py-2.5 px-4 font-mono text-slate-800 bg-slate-50">${p.txnId}</td>
           <td class="py-2.5 px-4 text-center">
-            <button onclick="deletePayment('${p.number}')" class="text-rose-600 hover:underline font-semibold">Delete</button>
+            <div class="flex items-center justify-center gap-2">
+              <button onclick="sendWhatsAppDoc('PAYMENT RECEIPT', '${p.number}', '${p.clientId || p.partyName}', ${p.amount}, 'Transaction ID: ${p.txnId || 'Verified'}')" class="text-emerald-600 hover:underline font-semibold" title="Send Receipt on WhatsApp">WA</button>
+              <button onclick="deletePayment('${p.number}')" class="text-rose-600 hover:underline font-semibold">Delete</button>
+            </div>
           </td>
         </tr>
       `).join('');
@@ -2836,7 +2866,7 @@
         <tr>
           <td style="text-align: center; font-family: monospace;">${idx + 1}</td>
           <td><strong>${itm.desc}</strong></td>
-          <td style="text-align: center; font-family: monospace;">${itm.hsn || ''}</td>
+          <td style="text-align: center; font-family: monospace;">${itm.hsn || '8436'}</td>
           <td style="text-align: center; font-family: monospace;">${itm.qty}</td>
           <td style="text-align: right; font-family: monospace;">₹${Number(itm.rate).toLocaleString('en-IN')}</td>
           <td style="text-align: right; font-family: monospace; font-weight: 700;">₹${Number(itm.amount).toLocaleString('en-IN')}</td>
