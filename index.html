@@ -82,7 +82,6 @@
     <!-- ================= DARK SIDEBAR ================= -->
     <aside id="mainSidebar" class="sidebar-expanded bg-slate-950 text-slate-300 border-r border-slate-800 flex flex-col justify-between transition-all duration-300 select-none z-30 shrink-0">
       
-      <!-- Top Branding Section with Local Logo.jpg (No duplicate toggle) -->
       <div>
         <div class="h-16 px-3 flex items-center justify-between border-b border-slate-800/80 bg-slate-950">
           <div class="flex items-center gap-2.5 overflow-hidden w-full">
@@ -277,7 +276,6 @@
 
         <!-- ================= TAB: DASHBOARD ================= -->
         <section id="tab-dashboard" class="tab-pane space-y-6">
-          <!-- Factory Header Card with Official Logo.jpg -->
           <div class="bg-gradient-to-r from-slate-950 via-slate-900 to-slate-800 text-white p-5 rounded-xl border border-slate-700 shadow-sm flex flex-col md:flex-row items-start md:items-center justify-between gap-5">
             <div class="flex items-center gap-4">
               <div class="h-16 w-16 rounded-xl bg-amber-500/10 border border-amber-500/40 p-1 overflow-hidden flex items-center justify-center shrink-0 shadow-lg">
@@ -1397,7 +1395,30 @@
       filename: 'document.pdf'
     };
 
-    // Official AVS Agro Letterhead Header Generator with local ./Logo.jpg
+    // Supabase Connection Credentials
+    const SUPABASE_URL = "https://sxwtiqqwvydufcdpevdu.supabase.co";
+    const SUPABASE_KEY = "sb_publishable_05ozgimqRBtFo4-CSrC7yA_mepPMzYu";
+    let supabaseClient = null;
+    let isCloudConnected = false;
+
+    // Initial State with Zero Mock Records
+    let appState = {
+      settings: { ...defaultSettings },
+      clients: [],
+      products: [],
+      works: [],
+      quotations: [],
+      salesOrders: [],
+      purchaseOrders: [],
+      invoices: [],
+      expenses: [],
+      payments: []
+    };
+
+    let activeDocFilename = 'document.pdf';
+    let currentSelectedClient360Id = null;
+
+    // Official Letterhead Generator
     function getDocumentHeaderHtml(docTitle, docNumber, docDate) {
       const s = appState.settings;
       return `
@@ -1453,14 +1474,18 @@
     // ================= WHATSAPP SHARING ENGINE =================
     function sendWhatsAppDoc(type, number, clientIdentifier, amount, extraMsg = '') {
       const client = resolveClient(clientIdentifier);
-      const phone = client ? (client.phone || '').replace(/[^0-9]/g, '') : '';
+      let phone = client ? (client.phone || '').replace(/[^0-9]/g, '') : '';
+      if (!phone && typeof clientIdentifier === 'string') {
+        const directNum = clientIdentifier.replace(/[^0-9]/g, '');
+        if (directNum.length >= 10) phone = directNum;
+      }
       const s = appState.settings;
 
       const formattedAmount = Number(amount || 0).toLocaleString('en-IN');
       const textLines = [
         `*Greetings from ${s.companyName} (Satana Works)*`,
         ``,
-        `Dear *${client ? client.name : 'Customer'}*,`,
+        `Dear *${client ? client.name : 'Valued Customer'}*,`,
         `Please find the official details of your *${type}* *#${number}*:`,
         `• *Document:* ${type}`,
         `• *Reference #:* ${number}`,
@@ -1472,55 +1497,36 @@
         `A/C: ${s.bankAcc}`,
         `IFSC: ${s.bankIfsc}`,
         ``,
-        `_Note: The official PDF document has been generated. Kindly verify the attached PDF copy for full specifications and terms._`,
-        `Contact / Office: ${s.companyPhone}`
+        `_Note: The official PDF copy has been generated. Contact: ${s.companyPhone}_`
       ].filter(Boolean).join('\n');
 
       const encoded = encodeURIComponent(textLines);
-      const targetPhone = phone.length >= 10 ? (phone.length === 10 ? `91${phone}` : phone) : '';
-      const waUrl = targetPhone ? `https://wa.me/${targetPhone}?text=${encoded}` : `https://wa.me/?text=${encoded}`;
+      let targetPhone = phone.length >= 10 ? (phone.length === 10 ? `91${phone}` : phone) : '';
       
+      const waUrl = targetPhone 
+        ? `https://api.whatsapp.com/send?phone=${targetPhone}&text=${encoded}`
+        : `https://api.whatsapp.com/send?text=${encoded}`;
+      
+      // Open immediately synchronously to bypass browser popup blockers
       window.open(waUrl, '_blank');
     }
 
-    async function shareActiveDocWhatsApp() {
+    function shareActiveDocWhatsApp() {
+      // 1. Download PDF
       downloadActiveDocPDF();
-      showToast('PDF downloaded! Opening WhatsApp...');
+      showToast('Downloading PDF & launching WhatsApp...');
 
-      setTimeout(() => {
-        sendWhatsAppDoc(
-          activeDocContext.type,
-          activeDocContext.number,
-          activeDocContext.clientName,
-          activeDocContext.total,
-          'Official PDF document downloaded to your device.'
-        );
-      }, 500);
+      // 2. Open WhatsApp directly
+      sendWhatsAppDoc(
+        activeDocContext.type,
+        activeDocContext.number,
+        activeDocContext.clientName,
+        activeDocContext.total,
+        'Official PDF document generated.'
+      );
     }
 
-    // Initial Clean State with Zero Mock Records
-    let appState = {
-      settings: { ...defaultSettings },
-      clients: [],
-      products: [],
-      works: [],
-      quotations: [],
-      salesOrders: [],
-      purchaseOrders: [],
-      invoices: [],
-      expenses: [],
-      payments: []
-    };
-
-    let activeDocFilename = 'document.pdf';
-    let currentSelectedClient360Id = null;
-
-    // Supabase Client Handle
-    const SUPABASE_URL = "https://sxwtiqqwvydufcdpevdu.supabase.co";
-    const SUPABASE_KEY = "sb_publishable_05ozgimqRBtFo4-CSrC7yA_mepPMzYu";
-    let supabaseClient = null;
-    let isCloudConnected = false;
-
+    // Initialize Database
     function initDatabase() {
       try {
         const stored = localStorage.getItem(DB_KEY);
@@ -1551,7 +1557,6 @@
         if (!window.supabase) return;
         supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-        // Fetch cloud state
         const { data, error } = await supabaseClient
           .from('avs_erp_data')
           .select('state')
@@ -1572,7 +1577,6 @@
         const syncBadge = document.getElementById('cloudSyncBadge');
         if (syncBadge) syncBadge.classList.remove('hidden');
 
-        // Realtime Subscription across all devices
         supabaseClient
           .channel('public:avs_erp_data')
           .on('postgres_changes', { event: '*', schema: 'public', table: 'avs_erp_data' }, payload => {
@@ -1636,7 +1640,6 @@
       reindexArraySequences(appState.expenses, 'AVS/EXP', 'number');
       reindexArraySequences(appState.payments, 'AVS/REC', 'number');
 
-      // Contiguous Master IDs
       appState.clients.forEach((c, idx) => { c.id = `AVS-CLI-${pad4(idx + 1)}`; });
       appState.products.forEach((p, idx) => { p.id = `AVS-PRD-${pad4(idx + 1)}`; });
 
@@ -1882,7 +1885,7 @@
 
       const phoneDigits = c.phone.replace(/[^0-9]/g, '');
       const waMsg = encodeURI(`Hello ${c.name}, greeting from AVS Agro Engineers Satana. Your outstanding balance is ₹${bal.toLocaleString('en-IN')}. Please verify.`);
-      document.getElementById('c360WhatsAppBtn').href = `https://wa.me/91${phoneDigits}?text=${waMsg}`;
+      document.getElementById('c360WhatsAppBtn').href = `https://api.whatsapp.com/send?phone=91${phoneDigits}&text=${waMsg}`;
 
       const clientInvoices = appState.invoices.filter(i => i.clientId === c.id);
       const invBody = document.getElementById('c360InvoicesList');
@@ -1932,7 +1935,7 @@
         const p = appState.products.find(x => x.id === id);
         if (p) {
           document.getElementById('prdName').value = p.name || '';
-          document.getElementById('prdHsn').value = p.hsn || '';
+          document.getElementById('prdHsn').value = p.hsn || '8436';
           document.getElementById('prdRate').value = p.rate || '';
           document.getElementById('prdSpecs').value = p.specs || '';
         }
@@ -2080,7 +2083,7 @@
           <td class="py-2.5 px-4 text-slate-600">${w.date}</td>
           <td class="py-2.5 px-4 font-bold text-slate-800">${w.clientName}</td>
           <td class="py-2.5 px-4 text-slate-700">${w.machine}</td>
-          <td class="py-2.5 px-4 text-slate-600">${w.targetDate || '-'}</td>
+          <td class="py-2.5 px-4 text-slate-500">${w.targetDate || '-'}</td>
           <td class="py-2.5 px-4">
             <select onchange="updateWorkStage('${w.number}', this.value)" class="px-2 py-1 border rounded text-[11px] font-semibold bg-white focus:outline-none focus:ring-1 focus:ring-amber-500">
               <option value="Raw Material Cutting" ${w.stage === 'Raw Material Cutting' ? 'selected' : ''}>Cutting</option>
@@ -2278,7 +2281,7 @@
           <td class="py-2.5 px-4 text-center">
             <div class="flex items-center justify-center gap-2">
               <button onclick="previewQuotationDoc('${q.number}')" class="text-slate-700 hover:underline font-semibold">View/PDF</button>
-              <button onclick="previewQuotationDoc('${q.number}'); setTimeout(shareActiveDocWhatsApp, 400);" class="text-emerald-600 hover:underline font-semibold flex items-center gap-0.5" title="Send Quotation PDF on WhatsApp">
+              <button onclick="sendWhatsAppDoc('QUOTATION', '${q.number}', '${q.clientId || q.clientName}', ${q.total})" class="text-emerald-600 hover:underline font-semibold flex items-center gap-0.5" title="Send Quotation PDF on WhatsApp">
                 <span>WA</span>
               </button>
               ${q.status !== 'Converted' ? `<button onclick="convertQuoteToSalesOrder('${q.number}')" class="text-cyan-600 hover:underline font-semibold">To SO</button>` : ''}
@@ -2591,7 +2594,7 @@
           <td class="py-2.5 px-4 text-center">
             <div class="flex items-center justify-center gap-2">
               <button onclick="previewInvoiceDoc('${inv.number}')" class="text-slate-700 hover:underline font-semibold">View/PDF</button>
-              <button onclick="previewInvoiceDoc('${inv.number}'); setTimeout(shareActiveDocWhatsApp, 400);" class="text-emerald-600 hover:underline font-semibold" title="Send Tax Invoice PDF on WhatsApp">
+              <button onclick="sendWhatsAppDoc('TAX INVOICE', '${inv.number}', '${inv.clientId || inv.clientName}', ${inv.total})" class="text-emerald-600 hover:underline font-semibold" title="Send Tax Invoice PDF on WhatsApp">
                 <span>WA</span>
               </button>
               <button onclick="deleteInvoice('${inv.number}')" class="text-rose-600 hover:underline font-semibold">Delete</button>
@@ -3242,18 +3245,6 @@
       renderExpensesTable();
       renderPaymentsTable();
       updateDashboardKPIs();
-    }
-
-    // Set Business Date (Pure date without second ticking)
-    function setHeaderBusinessDate() {
-      const el = document.getElementById('headerBusinessDateDisplay');
-      if (el) {
-        const d = new Date();
-        const yyyy = d.getFullYear();
-        const mm = String(d.getMonth() + 1).padStart(2, '0');
-        const dd = String(d.getDate()).padStart(2, '0');
-        el.textContent = `${dd}/${mm}/${yyyy}`;
-      }
     }
 
     // Initialize application on load
