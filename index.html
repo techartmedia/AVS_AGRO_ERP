@@ -1,0 +1,2839 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AVS Agro Engineers - Enterprise ERP</title>
+  
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  
+  <!-- Fonts: Inter and JetBrains Mono -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter', 'sans-serif'],
+            mono: ['JetBrains Mono', 'monospace'],
+          }
+        }
+      }
+    }
+  </script>
+
+  <style>
+    /* Clean Minimalist Scrollbars */
+    ::-webkit-scrollbar { width: 5px; height: 5px; }
+    ::-webkit-scrollbar-track { background: #f8fafc; }
+    ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+    ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+
+    /* High-Precision Printing Stylesheet */
+    @media print {
+      body * {
+        visibility: hidden !important;
+      }
+      #printable-doc-sheet, #printable-doc-sheet * {
+        visibility: visible !important;
+      }
+      #print-modal-container {
+        position: absolute !important;
+        left: 0 !important;
+        top: 0 !important;
+        width: 100% !important;
+        height: auto !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        background: #ffffff !important;
+        overflow: visible !important;
+        z-index: 99999 !important;
+        display: block !important;
+      }
+      #printable-doc-sheet {
+        position: absolute !important;
+        left: 0 !important;
+        top: 0 !important;
+        width: 100% !important;
+        max-width: 100% !important;
+        margin: 0 !important;
+        padding: 24px 32px !important;
+        box-shadow: none !important;
+        border: none !important;
+        background: #ffffff !important;
+      }
+      .no-print {
+        display: none !important;
+      }
+    }
+  </style>
+</head>
+<body class="bg-slate-50 text-slate-800 font-sans antialiased flex h-screen overflow-hidden text-sm">
+
+  <!-- ================= RESPONSIVE SIDEBAR ================= -->
+  <aside id="app-sidebar" class="fixed inset-y-0 left-0 z-40 w-64 bg-white border-r border-slate-200 flex flex-col transition-transform duration-200 transform -translate-x-full lg:translate-x-0 lg:static lg:inset-0 select-none">
+    
+    <!-- Company Identity Header -->
+    <div class="h-16 flex items-center justify-between px-5 border-b border-slate-200 bg-white">
+      <div class="flex items-center space-x-3 overflow-hidden">
+        <div class="w-9 h-9 rounded-lg bg-slate-900 text-white flex items-center justify-center font-bold text-sm tracking-wide flex-shrink-0 shadow-sm">
+          AVS
+        </div>
+        <div class="truncate">
+          <h1 class="font-bold text-slate-900 text-sm leading-tight tracking-tight">AVS Agro Engineers</h1>
+          <p class="text-[11px] text-slate-500 font-medium truncate">ERP Software</p>
+        </div>
+      </div>
+      <button onclick="toggleMobileSidebar()" class="lg:hidden p-1 rounded-md text-slate-400 hover:text-slate-800 hover:bg-slate-100">
+        <i data-lucide="x" class="w-4 h-4"></i>
+      </button>
+    </div>
+
+    <!-- Navigation Links -->
+    <nav class="flex-1 overflow-y-auto px-3 py-4 space-y-1" id="sidebar-nav">
+      <!-- Injected via JavaScript -->
+    </nav>
+
+    <!-- Company Badge Footer -->
+    <div class="p-4 border-t border-slate-200 bg-slate-50 text-xs text-slate-600">
+      <div class="flex items-center justify-between">
+        <span class="font-semibold text-slate-900">Satana,Nashik</span>
+        <span class="text-[10px] bg-slate-200 font-mono text-slate-700 px-1.5 py-0.5 rounded">v3.3</span>
+      </div>
+      <p class="text-[11px] text-slate-500 mt-0.5">GST: 27AAHCA8912K1Z8</p>
+    </div>
+  </aside>
+
+  <!-- Mobile Overlay Backdrop -->
+  <div id="mobile-sidebar-backdrop" onclick="toggleMobileSidebar()" class="fixed inset-0 bg-slate-900/40 z-30 hidden lg:hidden"></div>
+
+  <!-- ================= MAIN VIEWPORT ================= -->
+  <div class="flex-1 flex flex-col h-full min-w-0 overflow-hidden bg-slate-50">
+    
+    <!-- Top Action Bar -->
+    <header class="h-16 bg-white border-b border-slate-200 flex items-center justify-between px-4 sm:px-6 z-20 flex-shrink-0">
+      <div class="flex items-center space-x-3">
+        <button onclick="toggleMobileSidebar()" class="lg:hidden p-2 rounded-lg border border-slate-200 text-slate-600 hover:bg-slate-50">
+          <i data-lucide="menu" class="w-4 h-4"></i>
+        </button>
+        <div>
+          <h2 id="page-title" class="text-base font-bold text-slate-900 leading-tight">Dashboard</h2>
+        </div>
+      </div>
+
+      <!-- Quick Actions -->
+      <div class="flex items-center space-x-2 sm:space-x-3">
+        <button onclick="openPaymentModal()" class="inline-flex items-center px-3 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg text-xs font-semibold shadow-sm transition">
+          <i data-lucide="plus-circle" class="w-3.5 h-3.5 mr-1.5"></i>
+          Record Payment
+        </button>
+        <button onclick="resetToSampleData()" title="Reset to initial data" class="px-2.5 py-1.5 bg-white hover:bg-slate-100 text-slate-600 border border-slate-200 rounded-lg text-xs font-medium transition">
+          <i data-lucide="rotate-ccw" class="w-3.5 h-3.5"></i>
+        </button>
+      </div>
+    </header>
+
+    <!-- Scrollable Workspace Body -->
+    <main class="flex-1 overflow-y-auto p-4 sm:p-6" id="workspace-container">
+      <!-- Active Module View Content Injected Here -->
+    </main>
+  </div>
+
+  <!-- ================= STANDARD DATA ENTRY MODAL CONTAINER ================= -->
+  <div id="form-modal-backdrop" class="fixed inset-0 bg-slate-900/50 backdrop-blur-xs z-50 flex items-center justify-center hidden p-3 sm:p-6 overflow-y-auto">
+    <div id="form-modal-box" class="bg-white rounded-xl shadow-2xl max-w-3xl w-full max-h-[92vh] flex flex-col overflow-hidden border border-slate-200">
+      <!-- Form Content Injected Here -->
+    </div>
+  </div>
+
+  <!-- ================= ROCK-SOLID A4 DOCUMENT PREVIEW & PRINT MODAL ================= -->
+  <!-- Fixed layout bug: Full-screen container with separate fixed bar and independent scroll area -->
+  <div id="print-modal-container" class="fixed inset-0 z-50 bg-slate-900/70 backdrop-blur-xs hidden flex flex-col justify-start">
+    
+    <!-- Top Utility Header (Sticky & Never Cut Off) -->
+    <div class="no-print h-16 w-full bg-white border-b border-slate-200 px-4 sm:px-8 flex items-center justify-between flex-shrink-0 z-10 shadow-xs">
+      <div class="flex items-center space-x-3">
+        <span class="w-2.5 h-2.5 rounded-full bg-emerald-500"></span>
+        <span id="doc-modal-title" class="font-bold text-xs uppercase tracking-wide text-slate-800">Document Print View</span>
+      </div>
+      <div class="flex items-center space-x-3">
+        <button onclick="window.print()" class="px-4 py-2 bg-slate-900 hover:bg-black text-white rounded-lg text-xs font-semibold flex items-center transition shadow-sm">
+          <i data-lucide="printer" class="w-3.5 h-3.5 mr-1.5"></i> Print / Download PDF
+        </button>
+        <button onclick="closeDocPreview()" class="p-2 rounded-lg text-slate-400 hover:text-slate-800 hover:bg-slate-100 transition">
+          <i data-lucide="x" class="w-5 h-5"></i>
+        </button>
+      </div>
+    </div>
+
+    <!-- Smooth Centered Scrollable Canvas for A4 Paper -->
+    <div class="flex-1 overflow-y-auto p-4 sm:p-8 bg-slate-100 flex justify-center">
+      <div id="printable-doc-sheet" class="bg-white p-8 sm:p-12 shadow-md border border-slate-200 max-w-3xl w-full text-slate-800 text-xs min-h-[980px] my-auto">
+        <!-- Rendered Clean Document Content -->
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast Notification -->
+  <div id="toast-message" class="fixed bottom-5 right-5 bg-slate-900 text-white text-xs px-4 py-2.5 rounded-lg shadow-xl z-50 transition-opacity duration-300 opacity-0 pointer-events-none"></div>
+
+  <!-- ================= APPLICATION CODE & LOGIC ================= -->
+  <script>
+    /* ------------------------------------------------------------------
+       1. LOCAL STORAGE DATABASE WITH MACHINE DETAILS (NO SPARES / STOCK)
+       ------------------------------------------------------------------ */
+    const STORAGE_KEY = 'AVS_AGRO_ENTERPRISE_ERP_V5';
+
+    const DEFAULT_SEED_DATA = {
+      company: {
+        name: "AVS Agro Engineers",
+        tagline: "Manufacturers of Poultry Farm Machinery, Feed Plants & Agricultural Equipment",
+        address: "Plot No. 42-B, Industrial Estate, MIDC Ambad, Nashik, Maharashtra - 422010",
+        gstin: "27AAHCA8912K1Z8",
+        pan: "AAHCA8912K",
+        phone: "+91 98224 55910 / +91 94231 88204",
+        email: "avsagroengineers@gmail.com",
+        website: "www.avsagroengineers.com",
+        bankName: "State Bank of India",
+        accountNo: "39201992810",
+        ifscCode: "SBIN0004521",
+        branch: "Industrial Estate Branch, Ambad, Nashik",
+        upiId: "avsagro@sbi"
+      },
+      customers: [
+        { id: 'CUST-001', name: 'Baramati Agro Feeds Ltd', contactPerson: 'Suresh Patil', phone: '+91 98220 11234', address: 'Plot 12, MIDC Baramati, Dist. Pune 413133', gstin: '27AABCB9011J1ZK' },
+        { id: 'CUST-002', name: 'Godavari Hatcheries & Poultry', contactPerson: 'Anand Shinde', phone: '+91 98812 77651', address: 'Sangamner Bypass Road, Ahmednagar 422605', gstin: '27AABCG1122K1ZZ' },
+        { id: 'CUST-003', name: 'Venkateshwara Broiler Breeders', contactPerson: 'Mahesh Deshmukh', phone: '+91 97654 32109', address: 'Sinnar Industrial Zone, Nashik 422103', gstin: '27AAECV5566L1ZQ' },
+        { id: 'CUST-004', name: 'Kaveri Broiler Farms & Feeds', contactPerson: 'Ravi Kumar', phone: '+91 94401 23456', address: 'Autonagar Phase 2, Vijayawada, AP 520007', gstin: '37AAACK4499P1ZM' }
+      ],
+      // Pure Machine Catalog: Model Name, Specs/Motor, Capacity, HSN, Base Price, Default GST%
+      machines: [
+        { 
+          id: 'MCH-001', 
+          name: 'Heavy Duty Hammer Mill 15 HP', 
+          motor: '15 HP 3-Phase 1440 RPM', 
+          capacity: '1.5 to 2.0 Tons/Hr', 
+          hsn: '8436', 
+          price: 95000, 
+          gstRate: 18, 
+          desc: 'High-speed poultry grain pulverizer with 36 alloy hammer blades and replaceable sieves.' 
+        },
+        { 
+          id: 'MCH-002', 
+          name: 'Mash Feed Vertical Batch Mixer', 
+          motor: '7.5 HP Heavy Duty Geared Motor', 
+          capacity: '1000 Kg per Batch (1 Ton)', 
+          hsn: '8436', 
+          price: 165000, 
+          gstRate: 18, 
+          desc: 'Vertical helical ribbon mixer with bottom bagging chute and cyclone dust filter.' 
+        },
+        { 
+          id: 'MCH-003', 
+          name: 'Automatic Broiler Pan Feeder System (200 Ft)', 
+          motor: '1.5 HP 3-Phase Drive Unit', 
+          capacity: '120 Feeder Pans (Up to 5000 Birds)', 
+          hsn: '8436', 
+          price: 145000, 
+          gstRate: 18, 
+          desc: 'Complete galvanized feeder line with South African spiral auger, suspension winches & sensors.' 
+        },
+        { 
+          id: 'MCH-004', 
+          name: 'Commercial Ring-Die Poultry Pellet Mill', 
+          motor: '25 HP High Torque Induction Motor', 
+          capacity: '1.0 to 1.5 Tons/Hr', 
+          hsn: '8436', 
+          price: 280000, 
+          gstRate: 18, 
+          desc: 'Die-extrusion poultry pellet plant with stainless steel feeder conditioner and magnetic separator.' 
+        },
+        { 
+          id: 'MCH-005', 
+          name: 'Poultry Manure Scraper Winch System', 
+          motor: '2.0 HP Double Track Winch Motor', 
+          capacity: 'Double Track Shed (Length up to 350 Ft)', 
+          hsn: '8436', 
+          price: 82000, 
+          gstRate: 18, 
+          desc: 'Automated bird manure removal winch with 304-grade stainless steel scraper blades and auto-reverse.' 
+        },
+        { 
+          id: 'MCH-006', 
+          name: 'Rotary Poultry Feather Plucker Machine', 
+          motor: '3.0 HP Single Phase / 3 Phase', 
+          capacity: '350 to 500 Birds/Hr', 
+          hsn: '8438', 
+          price: 68000, 
+          gstRate: 18, 
+          desc: 'Stainless steel drum with food-grade rubber plucking fingers and integrated water jet ring.' 
+        }
+      ],
+      quotations: [
+        {
+          id: 'QT-2026-001',
+          date: '2026-10-25',
+          customerId: 'CUST-001',
+          customerName: 'Baramati Agro Feeds Ltd',
+          items: [
+            { machineId: 'MCH-001', name: 'Heavy Duty Hammer Mill 15 HP', specs: '15 HP 3-Phase 1440 RPM | 1.5 - 2.0 T/Hr', hsn: '8436', qty: 2, price: 95000, taxable: 190000, gstRate: 18, gstAmount: 34200, total: 224200 },
+            { machineId: 'MCH-002', name: 'Mash Feed Vertical Batch Mixer', specs: '7.5 HP Geared Motor | 1 Ton/Batch', hsn: '8436', qty: 1, price: 165000, taxable: 165000, gstRate: 18, gstAmount: 29700, total: 194700 }
+          ],
+          taxableSubtotal: 355000,
+          cgst: 31950,
+          sgst: 31950,
+          totalGst: 63900,
+          grandTotal: 418900,
+          status: 'Converted to SO'
+        },
+        {
+          id: 'QT-2026-002',
+          date: '2026-10-28',
+          customerId: 'CUST-004',
+          customerName: 'Kaveri Broiler Farms & Feeds',
+          items: [
+            { machineId: 'MCH-003', name: 'Automatic Broiler Pan Feeder System (200 Ft)', specs: '1.5 HP Drive Unit | 120 Pans', hsn: '8436', qty: 2, price: 145000, taxable: 290000, gstRate: 18, gstAmount: 52200, total: 342200 }
+          ],
+          taxableSubtotal: 290000,
+          cgst: 26100,
+          sgst: 26100,
+          totalGst: 52200,
+          grandTotal: 342200,
+          status: 'Pending'
+        }
+      ],
+      salesOrders: [
+        {
+          id: 'SO-2026-001',
+          quotationId: 'QT-2026-001',
+          date: '2026-10-26',
+          customerId: 'CUST-001',
+          customerName: 'Baramati Agro Feeds Ltd',
+          items: [
+            { machineId: 'MCH-001', name: 'Heavy Duty Hammer Mill 15 HP', specs: '15 HP 3-Phase 1440 RPM | 1.5 - 2.0 T/Hr', hsn: '8436', qty: 2, price: 95000, taxable: 190000, gstRate: 18, gstAmount: 34200, total: 224200 },
+            { machineId: 'MCH-002', name: 'Mash Feed Vertical Batch Mixer', specs: '7.5 HP Geared Motor | 1 Ton/Batch', hsn: '8436', qty: 1, price: 165000, taxable: 165000, gstRate: 18, gstAmount: 29700, total: 194700 }
+          ],
+          taxableSubtotal: 355000,
+          cgst: 31950,
+          sgst: 31950,
+          totalGst: 63900,
+          grandTotal: 418900,
+          deliveryDate: '2026-11-15',
+          status: 'In Production',
+          invoiceId: 'INV-2026-001'
+        },
+        {
+          id: 'SO-2026-002',
+          quotationId: null,
+          date: '2026-10-29',
+          customerId: 'CUST-003',
+          customerName: 'Venkateshwara Broiler Breeders',
+          items: [
+            { machineId: 'MCH-005', name: 'Poultry Manure Scraper Winch System', specs: '2.0 HP Double Track Winch | Length 350 Ft', hsn: '8436', qty: 1, price: 82000, taxable: 82000, gstRate: 18, gstAmount: 14760, total: 96760 }
+          ],
+          taxableSubtotal: 82000,
+          cgst: 7380,
+          sgst: 7380,
+          totalGst: 14760,
+          grandTotal: 96760,
+          deliveryDate: '2026-11-10',
+          status: 'Ready for Dispatch',
+          invoiceId: null
+        },
+        {
+          id: 'SO-2026-003',
+          quotationId: null,
+          date: '2026-11-01',
+          customerId: 'CUST-002',
+          customerName: 'Godavari Hatcheries & Poultry',
+          items: [
+            { machineId: 'MCH-004', name: 'Commercial Ring-Die Poultry Pellet Mill', specs: '25 HP Induction Motor | 1.0 - 1.5 T/Hr', hsn: '8436', qty: 1, price: 280000, taxable: 280000, gstRate: 18, gstAmount: 50400, total: 330400 }
+          ],
+          taxableSubtotal: 280000,
+          cgst: 25200,
+          sgst: 25200,
+          totalGst: 50400,
+          grandTotal: 330400,
+          deliveryDate: '2026-11-25',
+          status: 'In Production',
+          invoiceId: null
+        }
+      ],
+      invoices: [
+        {
+          id: 'INV-2026-001',
+          soId: 'SO-2026-001',
+          date: '2026-10-27',
+          dueDate: '2026-11-15',
+          customerId: 'CUST-001',
+          customerName: 'Baramati Agro Feeds Ltd',
+          items: [
+            { machineId: 'MCH-001', name: 'Heavy Duty Hammer Mill 15 HP', specs: '15 HP 3-Phase 1440 RPM | 1.5 - 2.0 T/Hr', hsn: '8436', qty: 2, price: 95000, taxable: 190000, gstRate: 18, gstAmount: 34200, total: 224200 },
+            { machineId: 'MCH-002', name: 'Mash Feed Vertical Batch Mixer', specs: '7.5 HP Geared Motor | 1 Ton/Batch', hsn: '8436', qty: 1, price: 165000, taxable: 165000, gstRate: 18, gstAmount: 29700, total: 194700 }
+          ],
+          taxableSubtotal: 355000,
+          cgst: 31950,
+          sgst: 31950,
+          totalGst: 63900,
+          grandTotal: 418900
+        },
+        {
+          id: 'INV-2026-002',
+          soId: null,
+          date: '2026-10-30',
+          dueDate: '2026-11-10',
+          customerId: 'CUST-002',
+          customerName: 'Godavari Hatcheries & Poultry',
+          items: [
+            { machineId: 'MCH-006', name: 'Rotary Poultry Feather Plucker Machine', specs: '3.0 HP 3 Phase | 350-500 Birds/Hr', hsn: '8438', qty: 1, price: 68000, taxable: 68000, gstRate: 18, gstAmount: 12240, total: 80240 }
+          ],
+          taxableSubtotal: 68000,
+          cgst: 6120,
+          sgst: 6120,
+          totalGst: 12240,
+          grandTotal: 80240
+        }
+      ],
+      payments: [
+        {
+          id: 'REC-2026-001',
+          date: '2026-10-28',
+          docId: 'SO-2026-001',
+          docType: 'Sales Order',
+          customerName: 'Baramati Agro Feeds Ltd',
+          amount: 250000,
+          method: 'Bank Transfer (NEFT/RTGS)',
+          refNo: 'NEFT-559102812',
+          notes: 'Advance booking amount for fabrication start'
+        },
+        {
+          id: 'REC-2026-002',
+          date: '2026-10-31',
+          docId: 'INV-2026-002',
+          docType: 'Tax Invoice',
+          customerName: 'Godavari Hatcheries & Poultry',
+          amount: 80240,
+          method: 'UPI',
+          refNo: 'UPI-98224559101',
+          notes: 'Full payment cleared against feather plucker invoice'
+        },
+        {
+          id: 'REC-2026-003',
+          date: '2026-11-02',
+          docId: 'SO-2026-002',
+          docType: 'Sales Order',
+          customerName: 'Venkateshwara Broiler Breeders',
+          amount: 40000,
+          method: 'Cheque',
+          refNo: 'CHQ-882041',
+          notes: 'Advance received against manure scraper system'
+        }
+      ],
+      pos: [
+        {
+          id: 'PO-2026-001',
+          date: '2026-10-22',
+          vendorName: 'Bharat Mild Steels Pvt Ltd',
+          vendorAddress: 'MIDC Satpur, Nashik - 422007',
+          vendorGst: '27AABCB1092K1Z9',
+          items: [
+            { name: '6mm Hot Rolled MS Steel Plates', hsn: '7208', qty: 15, price: 4500, taxable: 67500, gstRate: 18, gstAmount: 12150, total: 79650 },
+            { name: 'Heavy Duty Structural Channels 100x50mm', hsn: '7216', qty: 8, price: 3200, taxable: 25600, gstRate: 18, gstAmount: 4608, total: 30208 }
+          ],
+          taxableSubtotal: 93100,
+          cgst: 8379,
+          sgst: 8379,
+          totalGst: 16758,
+          grandTotal: 109858,
+          deliveryDate: '2026-11-05',
+          status: 'Received'
+        },
+        {
+          id: 'PO-2026-002',
+          date: '2026-10-29',
+          vendorName: 'Kirloskar Industrial Motors',
+          vendorAddress: 'Shivajinagar, Pune - 411005',
+          vendorGst: '27AAACK8891P1ZV',
+          items: [
+            { name: '15 HP 3-Phase 1440 RPM Induction Motor', hsn: '8501', qty: 2, price: 34000, taxable: 68000, gstRate: 18, gstAmount: 12240, total: 80240 }
+          ],
+          taxableSubtotal: 68000,
+          cgst: 6120,
+          sgst: 6120,
+          totalGst: 12240,
+          grandTotal: 80240,
+          deliveryDate: '2026-11-12',
+          status: 'Ordered'
+        }
+      ],
+      expenses: [
+        { id: 'EXP-2026-001', date: '2026-10-25', category: 'Lathe & CNC Turning', description: 'Rotor dynamic shaft balancing and lathe threading', amount: 8500, method: 'UPI' },
+        { id: 'EXP-2026-002', date: '2026-10-31', category: 'Factory Electricity', description: 'MSEDCL Industrial electricity bill for workshop', amount: 28400, method: 'Net Banking' },
+        { id: 'EXP-2026-003', date: '2026-11-03', category: 'Welding & Gas', description: 'CO2 cylinders refilling and E6013 welding rods', amount: 6200, method: 'Cash' }
+      ]
+    };
+
+    let db = null;
+
+    function initDb() {
+      const stored = localStorage.getItem(STORAGE_KEY);
+      if (stored) {
+        try {
+          db = JSON.parse(stored);
+          if (!db.machines && db.products) {
+            // Migrate legacy schema if needed
+            db.machines = db.products.map(p => ({
+              id: p.id.replace('PRD', 'MCH'),
+              name: p.name,
+              motor: 'Standard Industrial Motor',
+              capacity: 'Factory Standard Capacity',
+              hsn: p.hsn || '8436',
+              price: p.price || 50000,
+              gstRate: p.gstRate || 18,
+              desc: p.desc || ''
+            }));
+            delete db.products;
+            saveDb();
+          }
+        } catch (e) {
+          db = JSON.parse(JSON.stringify(DEFAULT_SEED_DATA));
+        }
+      } else {
+        db = JSON.parse(JSON.stringify(DEFAULT_SEED_DATA));
+        saveDb();
+      }
+    }
+
+    function saveDb() {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(db));
+    }
+
+    function resetToSampleData() {
+      if (confirm("Reset application to standard initial data? All tables will be restored.")) {
+        db = JSON.parse(JSON.stringify(DEFAULT_SEED_DATA));
+        saveDb();
+        renderActiveView();
+        showNotification("Reset to sample machinery & accounts completed.");
+      }
+    }
+
+    /* ------------------------------------------------------------------
+       2. STRICT SEQUENTIAL ID GENERATOR (001, 002, 003...)
+       ------------------------------------------------------------------ */
+    function getNextSequentialId(prefix, list) {
+      const year = '2026';
+      const searchPrefix = `${prefix}-${year}-`;
+      let highestNum = 0;
+
+      if (Array.isArray(list)) {
+        list.forEach(item => {
+          if (item && item.id && item.id.startsWith(searchPrefix)) {
+            const numPart = parseInt(item.id.replace(searchPrefix, ''), 10);
+            if (!isNaN(numPart) && numPart > highestNum) {
+              highestNum = numPart;
+            }
+          }
+        });
+      }
+      return `${searchPrefix}${String(highestNum + 1).padStart(3, '0')}`;
+    }
+
+    function getNextSimpleId(prefix, list) {
+      let highestNum = 0;
+      if (Array.isArray(list)) {
+        list.forEach(item => {
+          if (item && item.id && item.id.startsWith(prefix + '-')) {
+            const numPart = parseInt(item.id.replace(prefix + '-', ''), 10);
+            if (!isNaN(numPart) && numPart > highestNum) {
+              highestNum = numPart;
+            }
+          }
+        });
+      }
+      return `${prefix}-${String(highestNum + 1).padStart(3, '0')}`;
+    }
+
+    function sortBySequence(arr) {
+      return [...arr].sort((a, b) => (a.id > b.id ? 1 : -1));
+    }
+
+    /* ------------------------------------------------------------------
+       3. FINANCIAL & DUES CALCULATION ENGINE
+       ------------------------------------------------------------------ */
+    function getDocumentFinancials(docId) {
+      let grandTotal = 0;
+      let customerName = '';
+      let title = '';
+
+      const so = db.salesOrders.find(s => s.id === docId);
+      if (so) {
+        grandTotal = Number(so.grandTotal) || 0;
+        customerName = so.customerName;
+        title = `Sales Order ${so.id}`;
+      }
+
+      const inv = db.invoices.find(i => i.id === docId);
+      if (inv) {
+        grandTotal = Number(inv.grandTotal) || 0;
+        customerName = inv.customerName;
+        title = `Invoice ${inv.id}`;
+      }
+
+      // Sum matching payments
+      let totalPaid = 0;
+      db.payments.forEach(p => {
+        if (p.docId === docId) {
+          totalPaid += (Number(p.amount) || 0);
+        } else if (so && so.invoiceId && p.docId === so.invoiceId) {
+          totalPaid += (Number(p.amount) || 0);
+        } else if (inv && inv.soId && p.docId === inv.soId) {
+          totalPaid += (Number(p.amount) || 0);
+        }
+      });
+
+      const remainingBalance = Math.max(0, grandTotal - totalPaid);
+      let status = 'Unpaid';
+      if (totalPaid >= grandTotal && grandTotal > 0) {
+        status = 'Paid';
+      } else if (totalPaid > 0 && remainingBalance > 0) {
+        status = 'Partially Paid';
+      }
+
+      return {
+        grandTotal,
+        totalPaid,
+        remainingBalance,
+        status,
+        customerName,
+        title
+      };
+    }
+
+    function formatCurrency(amount) {
+      const val = Number(amount) || 0;
+      return '₹ ' + val.toLocaleString('en-IN');
+    }
+
+    function formatDate(dateStr) {
+      if (!dateStr) return '-';
+      const parts = dateStr.split('-');
+      if (parts.length === 3) return `${parts[2]}/${parts[1]}/${parts[0]}`;
+      return dateStr;
+    }
+
+    function showNotification(msg) {
+      const t = document.getElementById('toast-message');
+      t.textContent = msg;
+      t.classList.remove('opacity-0', 'pointer-events-none');
+      setTimeout(() => {
+        t.classList.add('opacity-0', 'pointer-events-none');
+      }, 2500);
+    }
+
+    /* ------------------------------------------------------------------
+       4. NAVIGATION & VIEWS SYSTEM
+       ------------------------------------------------------------------ */
+    let activeTab = 'dashboard';
+
+    const NAVIGATION_TABS = [
+      { id: 'dashboard', label: 'Dashboard', icon: 'layout-dashboard' },
+      { id: 'machines', label: 'Machinery Master', icon: 'wrench' },
+      { id: 'quotations', label: 'Quotations', icon: 'file-text' },
+      { id: 'salesOrders', label: 'Sales Orders (SO)', icon: 'clipboard-list' },
+      { id: 'invoices', label: 'Tax Invoices', icon: 'receipt' },
+      { id: 'payments', label: 'Payment Receipts', icon: 'wallet' },
+      { id: 'customers', label: 'Customer Farms', icon: 'users' },
+      { id: 'pos', label: 'Purchase Orders (PO)', icon: 'shopping-cart' },
+      { id: 'expenses', label: 'Expenses Ledger', icon: 'credit-card' }
+    ];
+
+    function renderSidebarNav() {
+      const container = document.getElementById('sidebar-nav');
+      container.innerHTML = NAVIGATION_TABS.map(tab => {
+        const isActive = activeTab === tab.id;
+        const btnClass = isActive
+          ? 'bg-slate-100 text-slate-900 font-semibold'
+          : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900 font-medium';
+
+        return `
+          <button onclick="navigateTo('${tab.id}')" class="w-full flex items-center px-3 py-2.5 rounded-lg text-xs transition ${btnClass}">
+            <i data-lucide="${tab.icon}" class="w-4 h-4 mr-3 flex-shrink-0 ${isActive ? 'text-slate-900' : 'text-slate-400'}"></i>
+            <span class="truncate">${tab.label}</span>
+          </button>
+        `;
+      }).join('');
+      lucide.createIcons();
+    }
+
+    function navigateTo(tabId) {
+      activeTab = tabId;
+      renderSidebarNav();
+      
+      const currentNav = NAVIGATION_TABS.find(t => t.id === tabId);
+      document.getElementById('page-title').textContent = currentNav ? currentNav.label : 'Overview';
+      
+      renderActiveView();
+      
+      // Close mobile drawer if open
+      const sidebar = document.getElementById('app-sidebar');
+      const backdrop = document.getElementById('mobile-sidebar-backdrop');
+      sidebar.classList.add('-translate-x-full');
+      backdrop.classList.add('hidden');
+    }
+
+    function toggleMobileSidebar() {
+      const sidebar = document.getElementById('app-sidebar');
+      const backdrop = document.getElementById('mobile-sidebar-backdrop');
+      const isClosed = sidebar.classList.contains('-translate-x-full');
+      if (isClosed) {
+        sidebar.classList.remove('-translate-x-full');
+        backdrop.classList.remove('hidden');
+      } else {
+        sidebar.classList.add('-translate-x-full');
+        backdrop.classList.add('hidden');
+      }
+    }
+
+    function renderActiveView() {
+      const container = document.getElementById('workspace-container');
+      switch (activeTab) {
+        case 'dashboard': renderDashboardView(container); break;
+        case 'machines': renderMachinesView(container); break;
+        case 'quotations': renderQuotationsView(container); break;
+        case 'salesOrders': renderSalesOrdersView(container); break;
+        case 'invoices': renderInvoicesView(container); break;
+        case 'payments': renderPaymentsView(container); break;
+        case 'customers': renderCustomersView(container); break;
+        case 'pos': renderPurchaseOrdersView(container); break;
+        case 'expenses': renderExpensesView(container); break;
+      }
+      lucide.createIcons();
+    }
+
+    function renderStatusPill(status, remainingBalance) {
+      if (status === 'Paid') {
+        return `<span class="inline-flex items-center px-2 py-0.5 rounded text-[11px] font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200">Paid Full</span>`;
+      } else if (status === 'Partially Paid') {
+        return `<span class="inline-flex items-center px-2 py-0.5 rounded text-[11px] font-semibold bg-amber-50 text-amber-700 border border-amber-200">Partial (${formatCurrency(remainingBalance)} due)</span>`;
+      }
+      return `<span class="inline-flex items-center px-2 py-0.5 rounded text-[11px] font-semibold bg-red-50 text-red-600 border border-red-200">Unpaid (${formatCurrency(remainingBalance)})</span>`;
+    }
+
+    /* ------------------------------------------------------------------
+       MODULE 1: DASHBOARD
+       ------------------------------------------------------------------ */
+    function renderDashboardView(el) {
+      let totalSalesVal = 0;
+      let totalReceivedVal = 0;
+      let totalDuesVal = 0;
+
+      db.salesOrders.forEach(so => {
+        const fin = getDocumentFinancials(so.id);
+        totalSalesVal += fin.grandTotal;
+        totalReceivedVal += fin.totalPaid;
+        totalDuesVal += fin.remainingBalance;
+      });
+
+      const orderedList = sortBySequence(db.salesOrders);
+
+      el.innerHTML = `
+        <div class="space-y-6 max-w-6xl mx-auto">
+          
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+            <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-xs">
+              <span class="text-xs font-semibold text-slate-500 uppercase tracking-wide">Total Sales Orders</span>
+              <h3 class="text-2xl font-bold text-slate-900 mt-1">${formatCurrency(totalSalesVal)}</h3>
+              <p class="text-xs text-slate-500 mt-2">${db.salesOrders.length} manufacturing orders logged</p>
+            </div>
+
+            <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-xs">
+              <span class="text-xs font-semibold text-slate-500 uppercase tracking-wide">Payments Received</span>
+              <h3 class="text-2xl font-bold text-emerald-600 mt-1">${formatCurrency(totalReceivedVal)}</h3>
+              <p class="text-xs text-slate-500 mt-2">${db.payments.length} verified receipts issued</p>
+            </div>
+
+            <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-xs">
+              <span class="text-xs font-semibold text-slate-500 uppercase tracking-wide">Outstanding Receivables</span>
+              <h3 class="text-2xl font-bold text-amber-600 mt-1">${formatCurrency(totalDuesVal)}</h3>
+              <p class="text-xs text-slate-500 mt-2">Active customer dues awaiting clearance</p>
+            </div>
+          </div>
+
+          <div class="bg-white rounded-xl border border-slate-200 shadow-xs overflow-hidden">
+            <div class="p-4 border-b border-slate-100 flex items-center justify-between">
+              <div>
+                <h4 class="font-bold text-slate-900 text-sm">Machinery Sales Orders & Dues Status</h4>
+                <p class="text-xs text-slate-500">Chronological sequential orders with live payment dues tracking</p>
+              </div>
+              <button onclick="navigateTo('salesOrders')" class="text-xs font-semibold text-slate-700 hover:text-black">
+                Manage All Orders &rarr;
+              </button>
+            </div>
+
+            <div class="overflow-x-auto">
+              <table class="w-full text-left text-xs">
+                <thead class="bg-slate-50 text-slate-500 uppercase text-[11px] font-semibold border-b border-slate-200">
+                  <tr>
+                    <th class="py-3 px-4">SO #</th>
+                    <th class="py-3 px-4">Customer Farm</th>
+                    <th class="py-3 px-4">Order Total</th>
+                    <th class="py-3 px-4">Amount Paid</th>
+                    <th class="py-3 px-4">Remaining Balance</th>
+                    <th class="py-3 px-4">Payment Status</th>
+                    <th class="py-3 px-4 text-right">Actions</th>
+                  </tr>
+                </thead>
+                <tbody class="divide-y divide-slate-100">
+                  ${orderedList.map(so => {
+                    const fin = getDocumentFinancials(so.id);
+                    return `
+                      <tr class="hover:bg-slate-50/70 transition">
+                        <td class="py-3.5 px-4 font-mono font-semibold text-slate-900">${so.id}</td>
+                        <td class="py-3.5 px-4 font-medium text-slate-900">${so.customerName}</td>
+                        <td class="py-3.5 px-4 font-semibold text-slate-900">${formatCurrency(fin.grandTotal)}</td>
+                        <td class="py-3.5 px-4 font-semibold text-emerald-600">${formatCurrency(fin.totalPaid)}</td>
+                        <td class="py-3.5 px-4 font-bold ${fin.remainingBalance > 0 ? 'text-amber-600' : 'text-slate-400'}">
+                          ${formatCurrency(fin.remainingBalance)}
+                        </td>
+                        <td class="py-3.5 px-4">
+                          ${renderStatusPill(fin.status, fin.remainingBalance)}
+                        </td>
+                        <td class="py-3.5 px-4 text-right space-x-2">
+                          <button onclick="previewDocument('so', '${so.id}')" title="View SO Document" class="p-1 text-slate-500 hover:text-slate-900">
+                            <i data-lucide="eye" class="w-4 h-4 inline"></i>
+                          </button>
+                          ${fin.remainingBalance > 0 ? `
+                            <button onclick="openPaymentModal('${so.id}')" class="px-2.5 py-1 bg-slate-900 hover:bg-black text-white text-[11px] font-semibold rounded-md shadow-xs">
+                              Record Pay
+                            </button>
+                          ` : `
+                            <span class="text-xs text-slate-400 font-medium">Settled</span>
+                          `}
+                        </td>
+                      </tr>
+                    `;
+                  }).join('')}
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+        </div>
+      `;
+    }
+
+    /* ------------------------------------------------------------------
+       MODULE 2: MACHINERY MASTER CATALOG (NO SPARES, NO INVENTORY STOCK)
+       ------------------------------------------------------------------ */
+    function renderMachinesView(el) {
+      const items = sortBySequence(db.machines);
+
+      el.innerHTML = `
+        <div class="space-y-4 max-w-6xl mx-auto">
+          <div class="flex items-center justify-between">
+            <div>
+              <h3 class="font-bold text-slate-900 text-sm">Machinery Master Catalog</h3>
+              <p class="text-xs text-slate-500">Manufactured poultry equipment specifications, motor ratings, capacity, and standard pricing</p>
+            </div>
+            <button onclick="openNewMachineModal()" class="px-3.5 py-1.5 bg-slate-900 hover:bg-black text-white rounded-lg text-xs font-semibold flex items-center shadow-xs">
+              <i data-lucide="plus" class="w-3.5 h-3.5 mr-1.5"></i> Add Machine Model
+            </button>
+          </div>
+
+          <div class="bg-white rounded-xl border border-slate-200 shadow-xs overflow-hidden">
+            <div class="overflow-x-auto">
+              <table class="w-full text-left text-xs">
+                <thead class="bg-slate-50 text-slate-500 uppercase text-[11px] font-semibold border-b border-slate-200">
+                  <tr>
+                    <th class="py-3 px-4">Machine ID</th>
+                    <th class="py-3 px-4">Machine / Model Name</th>
+                    <th class="py-3 px-4">Motor Power</th>
+                    <th class="py-3 px-4">Rated Capacity</th>
+                    <th class="py-3 px-4 text-center">HSN</th>
+                    <th class="py-3 px-4 text-center">Default GST</th>
+                    <th class="py-3 px-4 text-right">Standard Price</th>
+                    <th class="py-3 px-4 text-right">Actions</th>
+                  </tr>
+                </thead>
+                <tbody class="divide-y divide-slate-100">
+                  ${items.map(m => `
+                    <tr class="hover:bg-slate-50/70 transition">
+                      <td class="py-3.5 px-4 font-mono font-semibold text-slate-900">${m.id}</td>
+                      <td class="py-3.5 px-4">
+                        <p class="font-bold text-slate-900">${m.name}</p>
+                        <p class="text-[11px] text-slate-500 truncate max-w-xs">${m.desc || ''}</p>
+                      </td>
+                      <td class="py-3.5 px-4 font-medium text-slate-700">${m.motor}</td>
+                      <td class="py-3.5 px-4 text-slate-700">${m.capacity}</td>
+                      <td class="py-3.5 px-4 text-center font-mono font-medium">${m.hsn}</td>
+                      <td class="py-3.5 px-4 text-center font-semibold text-slate-700">${m.gstRate}%</td>
+                      <td class="py-3.5 px-4 text-right font-bold text-slate-900">${formatCurrency(m.price)}</td>
+                      <td class="py-3.5 px-4 text-right space-x-1.5 whitespace-nowrap">
+                        <button onclick="editMachineModal('${m.id}')" class="p-1 text-slate-500 hover:text-slate-900" title="Edit Machine">
+                          <i data-lucide="edit-3" class="w-4 h-4 inline"></i>
+                        </button>
+                        <button onclick="deleteMachine('${m.id}')" class="p-1 text-slate-400 hover:text-red-600" title="Delete Machine">
+                          <i data-lucide="trash-2" class="w-4 h-4 inline"></i>
+                        </button>
+                      </td>
+                    </tr>
+                  `).join('')}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
+    function openNewMachineModal() {
+      const backdrop = document.getElementById('form-modal-backdrop');
+      const box = document.getElementById('form-modal-box');
+      const nextId = getNextSimpleId('MCH', db.machines);
+
+      box.innerHTML = `
+        <div class="h-14 px-5 border-b border-slate-200 flex items-center justify-between bg-white flex-shrink-0">
+          <h3 class="font-bold text-slate-900 text-sm">Add New Poultry Machine (${nextId})</h3>
+          <button onclick="closeFormModal()" class="p-1 text-slate-400 hover:text-slate-800 rounded">
+            <i data-lucide="x" class="w-4 h-4"></i>
+          </button>
+        </div>
+
+        <form onsubmit="saveMachineForm(event, '${nextId}')" class="p-5 overflow-y-auto space-y-4">
+          <div>
+            <label class="block text-xs font-semibold text-slate-700 mb-1">Machine / Model Name</label>
+            <input type="text" id="mch-name" placeholder="e.g. Twin Cone Mash Feed Blender" required class="w-full bg-white border border-slate-300 rounded-lg text-xs p-2.5">
+          </div>
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div>
+              <label class="block text-xs font-semibold text-slate-700 mb-1">Motor Power / Specifications</label>
+              <input type="text" id="mch-motor" placeholder="e.g. 10 HP 3-Phase 1440 RPM" required class="w-full bg-white border border-slate-300 rounded-lg text-xs p-2.5">
+            </div>
+            <div>
+              <label class="block text-xs font-semibold text-slate-700 mb-1">Rated Output Capacity</label>
+              <input type="text" id="mch-capacity" placeholder="e.g. 2 Tons / Batch or 3000 Birds/Hr" required class="w-full bg-white border border-slate-300 rounded-lg text-xs p-2.5">
+            </div>
+          </div>
+          <div class="grid grid-cols-3 gap-3">
+            <div>
+              <label class="block text-xs font-semibold text-slate-700 mb-1">HSN Code</label>
+              <input type="text" id="mch-hsn" value="8436" required class="w-full bg-white border border-slate-300 rounded-lg text-xs p-2.5 font-mono">
+            </div>
+            <div>
+              <label class="block text-xs font-semibold text-slate-700 mb-1">Default GST Rate (%)</label>
+              <input type="number" id="mch-gstr" value="18" min="0" max="28" required class="w-full bg-white border border-slate-300 rounded-lg text-xs p-2.5 font-bold">
+            </div>
+            <div>
+              <label class="block text-xs font-semibold text-slate-700 mb-1">Standard Price (₹)</label>
+              <input type="number" id="mch-price" min="0" placeholder="125000" required class="w-full bg-white border border-slate-300 rounded-lg text-xs p-2.5 font-bold">
+            </div>
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-slate-700 mb-1">Engineering Description</label>
+            <textarea id="mch-desc" rows="2" placeholder="Fabrication specs, plate thickness, bearing make, etc." class="w-full bg-white border border-slate-300 rounded-lg text-xs p-2.5"></textarea>
+          </div>
+          <div class="flex justify-end space-x-2 pt-2 border-t border-slate-200">
+            <button type="button" onclick="closeFormModal()" class="px-3.5 py-2 border border-slate-300 rounded-lg text-xs font-semibold text-slate-700 hover:bg-slate-50">Cancel</button>
+            <button type="submit" class="px-4 py-2 bg-slate-900 hover:bg-black text-white rounded-lg text-xs font-semibold">Save Machine</button>
+          </div>
+        </form>
+      `;
+
+      backdrop.classList.remove('hidden');
+      lucide.createIcons();
+    }
+
+    function saveMachineForm(e, nextId) {
+      e.preventDefault();
+      db.machines.push({
+        id: nextId,
+        name: document.getElementById('mch-name').value,
+        motor: document.getElementById('mch-motor').value,
+        capacity: document.getElementById('mch-capacity').value,
+        hsn: document.getElementById('mch-hsn').value,
+        gstRate: Number(document.getElementById('mch-gstr').value) || 18,
+        price: Number(document.getElementById('mch-price').value) || 0,
+        desc: document.getElementById('mch-desc').value
+      });
+
+      saveDb();
+      closeFormModal();
+      showNotification(`Machine ${nextId} added to catalog.`);
+      navigateTo('machines');
+    }
+
+    function editMachineModal(mchId) {
+      const m = db.machines.find(item => item.id === mchId);
+      if (!m) return;
+
+      const backdrop = document.getElementById('form-modal-backdrop');
+      const box = document.getElementById('form-modal-box');
+
+      box.innerHTML = `
+        <div class="h-14 px-5 border-b border-slate-200 flex items-center justify-between bg-white flex-shrink-0">
+          <h3 class="font-bold text-slate-900 text-sm">Edit Machine (${m.id})</h3>
+          <button onclick="closeFormModal()" class="p-1 text-slate-400 hover:text-slate-800 rounded">
+            <i data-lucide="x" class="w-4 h-4"></i>
+          </button>
+        </div>
+
+        <form onsubmit="saveEditedMachine(event, '${m.id}')" class="p-5 overflow-y-auto space-y-4">
+          <div>
+            <label class="block text-xs font-semibold text-slate-700 mb-1">Machine / Model Name</label>
+            <input type="text" id="edit-mch-name" value="${m.name}" required class="w-full bg-white border border-slate-300 rounded-lg text-xs p-2.5">
+          </div>
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div>
+              <label class="block text-xs font-semibold text-slate-700 mb-1">Motor Power</label>
+              <input type="text" id="edit-mch-motor" value="${m.motor}" required class="w-full bg-white border border-slate-300 rounded-lg text-xs p-2.5">
+            </div>
+            <div>
+              <label class="block text-xs font-semibold text-slate-700 mb-1">Capacity</label>
+              <input type="text" id="edit-mch-capacity" value="${m.capacity}" required class="w-full bg-white border border-slate-300 rounded-lg text-xs p-2.5">
+            </div>
+          </div>
+          <div class="grid grid-cols-3 gap-3">
+            <div>
+              <label class="block text-xs font-semibold text-slate-700 mb-1">HSN Code</label>
+              <input type="text" id="edit-mch-hsn" value="${m.hsn}" required class="w-full bg-white border border-slate-300 rounded-lg text-xs p-2.5 font-mono">
+            </div>
+            <div>
+              <label class="block text-xs font-semibold text-slate-700 mb-1">Default GST Rate (%)</label>
+              <input type="number" id="edit-mch-gstr" value="${m.gstRate}" min="0" max="28" required class="w-full bg-white border border-slate-300 rounded-lg text-xs p-2.5 font-bold">
+            </div>
+            <div>
+              <label class="block text-xs font-semibold text-slate-700 mb-1">Price (₹)</label>
+              <input type="number" id="edit-mch-price" value="${m.price}" min="0" required class="w-full bg-white border border-slate-300 rounded-lg text-xs p-2.5 font-bold">
+            </div>
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-slate-700 mb-1">Description</label>
+            <textarea id="edit-mch-desc" rows="2" class="w-full bg-white border border-slate-300 rounded-lg text-xs p-2.5">${m.desc || ''}</textarea>
+          </div>
+          <div class="flex justify-end space-x-2 pt-2 border-t border-slate-200">
+            <button type="button" onclick="closeFormModal()" class="px-3.5 py-2 border border-slate-300 rounded-lg text-xs font-semibold text-slate-700 hover:bg-slate-50">Cancel</button>
+            <button type="submit" class="px-4 py-2 bg-slate-900 hover:bg-black text-white rounded-lg text-xs font-semibold">Update Machine</button>
+          </div>
+        </form>
+      `;
+
+      backdrop.classList.remove('hidden');
+      lucide.createIcons();
+    }
+
+    function saveEditedMachine(e, mchId) {
+      e.preventDefault();
+      const m = db.machines.find(item => item.id === mchId);
+      if (!m) return;
+
+      m.name = document.getElementById('edit-mch-name').value;
+      m.motor = document.getElementById('edit-mch-motor').value;
+      m.capacity = document.getElementById('edit-mch-capacity').value;
+      m.hsn = document.getElementById('edit-mch-hsn').value;
+      m.gstRate = Number(document.getElementById('edit-mch-gstr').value) || 18;
+      m.price = Number(document.getElementById('edit-mch-price').value) || 0;
+      m.desc = document.getElementById('edit-mch-desc').value;
+
+      saveDb();
+      closeFormModal();
+      showNotification(`Machine ${mchId} updated.`);
+      navigateTo('machines');
+    }
+
+    function deleteMachine(mchId) {
+      if (confirm(`Remove machine model ${mchId} from catalog?`)) {
+        db.machines = db.machines.filter(m => m.id !== mchId);
+        saveDb();
+        showNotification(`Machine ${mchId} removed.`);
+        renderActiveView();
+      }
+    }
+
+    /* ------------------------------------------------------------------
+       MODULE 3: QUOTATIONS
+       ------------------------------------------------------------------ */
+    function renderQuotationsView(el) {
+      const items = sortBySequence(db.quotations);
+
+      el.innerHTML = `
+        <div class="space-y-4 max-w-6xl mx-auto">
+          <div class="flex items-center justify-between">
+            <div>
+              <h3 class="font-bold text-slate-900 text-sm">Quotation Estimates</h3>
+              <p class="text-xs text-slate-500">Official machinery quotations with enterable GST rates and one-click conversion to SO</p>
+            </div>
+            <button onclick="openNewQuotationModal()" class="px-3.5 py-1.5 bg-slate-900 hover:bg-black text-white rounded-lg text-xs font-semibold flex items-center shadow-xs">
+              <i data-lucide="plus" class="w-3.5 h-3.5 mr-1.5"></i> New Quotation
+            </button>
+          </div>
+
+          <div class="bg-white rounded-xl border border-slate-200 shadow-xs overflow-hidden">
+            <div class="overflow-x-auto">
+              <table class="w-full text-left text-xs">
+                <thead class="bg-slate-50 text-slate-500 uppercase text-[11px] font-semibold border-b border-slate-200">
+                  <tr>
+                    <th class="py-3 px-4">Quote #</th>
+                    <th class="py-3 px-4">Date</th>
+                    <th class="py-3 px-4">Customer Farm</th>
+                    <th class="py-3 px-4">Taxable Value</th>
+                    <th class="py-3 px-4">GST Value</th>
+                    <th class="py-3 px-4">Grand Total</th>
+                    <th class="py-3 px-4">Status</th>
+                    <th class="py-3 px-4 text-right">Actions</th>
+                  </tr>
+                </thead>
+                <tbody class="divide-y divide-slate-100">
+                  ${items.map(q => `
+                    <tr class="hover:bg-slate-50/70 transition">
+                      <td class="py-3.5 px-4 font-mono font-semibold text-slate-900">${q.id}</td>
+                      <td class="py-3.5 px-4 text-slate-600">${formatDate(q.date)}</td>
+                      <td class="py-3.5 px-4 font-medium text-slate-900">${q.customerName}</td>
+                      <td class="py-3.5 px-4 text-slate-700">${formatCurrency(q.taxableSubtotal)}</td>
+                      <td class="py-3.5 px-4 text-slate-500">${formatCurrency(q.totalGst)}</td>
+                      <td class="py-3.5 px-4 font-bold text-slate-900">${formatCurrency(q.grandTotal)}</td>
+                      <td class="py-3.5 px-4">
+                        <span class="inline-flex px-2 py-0.5 rounded text-[11px] font-medium ${q.status === 'Converted to SO' ? 'bg-blue-50 text-blue-700 border border-blue-200' : 'bg-slate-100 text-slate-700'}">
+                          ${q.status}
+                        </span>
+                      </td>
+                      <td class="py-3.5 px-4 text-right space-x-2">
+                        <button onclick="previewDocument('quotation', '${q.id}')" title="View Document" class="p-1 text-slate-600 hover:text-slate-900">
+                          <i data-lucide="eye" class="w-4 h-4 inline"></i>
+                        </button>
+                        ${q.status !== 'Converted to SO' ? `
+                          <button onclick="convertQuoteToSo('${q.id}')" class="px-2.5 py-1 bg-emerald-600 hover:bg-emerald-700 text-white rounded text-[11px] font-semibold">
+                            Convert to SO
+                          </button>
+                        ` : ''}
+                      </td>
+                    </tr>
+                  `).join('')}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
+    function convertQuoteToSo(quoteId) {
+      const q = db.quotations.find(item => item.id === quoteId);
+      if (!q) return;
+
+      const newSoId = getNextSequentialId('SO', db.salesOrders);
+      db.salesOrders.push({
+        id: newSoId,
+        quotationId: q.id,
+        date: new Date().toISOString().split('T')[0],
+        customerId: q.customerId,
+        customerName: q.customerName,
+        items: JSON.parse(JSON.stringify(q.items)),
+        taxableSubtotal: q.taxableSubtotal,
+        cgst: q.cgst,
+        sgst: q.sgst,
+        totalGst: q.totalGst,
+        grandTotal: q.grandTotal,
+        deliveryDate: new Date(Date.now() + 15 * 86400000).toISOString().split('T')[0],
+        status: 'In Production',
+        invoiceId: null
+      });
+
+      q.status = 'Converted to SO';
+      saveDb();
+      showNotification(`Quotation converted to Sales Order: ${newSoId}`);
+      navigateTo('salesOrders');
+    }
+
+    /* ------------------------------------------------------------------
+       MODULE 4: SALES ORDERS (SO)
+       ------------------------------------------------------------------ */
+    function renderSalesOrdersView(el) {
+      const items = sortBySequence(db.salesOrders);
+
+      el.innerHTML = `
+        <div class="space-y-4 max-w-6xl mx-auto">
+          <div class="flex items-center justify-between">
+            <div>
+              <h3 class="font-bold text-slate-900 text-sm">Sales Orders (SO)</h3>
+              <p class="text-xs text-slate-500">Track fabrication progress, invoice status, and outstanding customer balances</p>
+            </div>
+            <button onclick="openNewSalesOrderModal()" class="px-3.5 py-1.5 bg-slate-900 hover:bg-black text-white rounded-lg text-xs font-semibold flex items-center shadow-xs">
+              <i data-lucide="plus" class="w-3.5 h-3.5 mr-1.5"></i> Direct Sales Order
+            </button>
+          </div>
+
+          <div class="bg-white rounded-xl border border-slate-200 shadow-xs overflow-hidden">
+            <div class="overflow-x-auto">
+              <table class="w-full text-left text-xs">
+                <thead class="bg-slate-50 text-slate-500 uppercase text-[11px] font-semibold border-b border-slate-200">
+                  <tr>
+                    <th class="py-3 px-4">SO #</th>
+                    <th class="py-3 px-4">Date</th>
+                    <th class="py-3 px-4">Customer Farm</th>
+                    <th class="py-3 px-4">Grand Total</th>
+                    <th class="py-3 px-4">Paid</th>
+                    <th class="py-3 px-4">Remaining Balance</th>
+                    <th class="py-3 px-4">Payment Status</th>
+                    <th class="py-3 px-4">Fabrication Status</th>
+                    <th class="py-3 px-4 text-right">Actions</th>
+                  </tr>
+                </thead>
+                <tbody class="divide-y divide-slate-100">
+                  ${items.map(so => {
+                    const fin = getDocumentFinancials(so.id);
+                    return `
+                      <tr class="hover:bg-slate-50/70 transition">
+                        <td class="py-3.5 px-4 font-mono font-semibold text-slate-900">${so.id}</td>
+                        <td class="py-3.5 px-4 text-slate-600">${formatDate(so.date)}</td>
+                        <td class="py-3.5 px-4 font-medium text-slate-900">${so.customerName}</td>
+                        <td class="py-3.5 px-4 font-semibold text-slate-900">${formatCurrency(fin.grandTotal)}</td>
+                        <td class="py-3.5 px-4 font-semibold text-emerald-600">${formatCurrency(fin.totalPaid)}</td>
+                        <td class="py-3.5 px-4 font-bold ${fin.remainingBalance > 0 ? 'text-amber-600' : 'text-slate-400'}">
+                          ${formatCurrency(fin.remainingBalance)}
+                        </td>
+                        <td class="py-3.5 px-4">
+                          ${renderStatusPill(fin.status, fin.remainingBalance)}
+                        </td>
+                        <td class="py-3.5 px-4">
+                          <select onchange="updateSoStatus('${so.id}', this.value)" class="text-xs bg-slate-50 border border-slate-300 rounded px-2 py-1 font-medium">
+                            <option value="In Production" ${so.status === 'In Production' ? 'selected' : ''}>In Production</option>
+                            <option value="Ready for Dispatch" ${so.status === 'Ready for Dispatch' ? 'selected' : ''}>Ready for Dispatch</option>
+                            <option value="Dispatched" ${so.status === 'Dispatched' ? 'selected' : ''}>Dispatched</option>
+                            <option value="Delivered" ${so.status === 'Delivered' ? 'selected' : ''}>Delivered</option>
+                          </select>
+                        </td>
+                        <td class="py-3.5 px-4 text-right space-x-1.5 whitespace-nowrap">
+                          <button onclick="previewDocument('so', '${so.id}')" title="Preview A4 Document" class="p-1 text-slate-600 hover:text-slate-900">
+                            <i data-lucide="eye" class="w-4 h-4 inline"></i>
+                          </button>
+                          ${fin.remainingBalance > 0 ? `
+                            <button onclick="openPaymentModal('${so.id}')" class="px-2.5 py-1 bg-emerald-600 hover:bg-emerald-700 text-white rounded text-[11px] font-semibold">
+                              Pay
+                            </button>
+                          ` : ''}
+                          ${!so.invoiceId ? `
+                            <button onclick="convertSoToInvoice('${so.id}')" class="px-2.5 py-1 bg-slate-900 hover:bg-black text-white rounded text-[11px] font-semibold">
+                              Create Invoice
+                            </button>
+                          ` : `
+                            <button onclick="previewDocument('invoice', '${so.invoiceId}')" title="Linked Invoice" class="px-2 py-0.5 bg-blue-50 text-blue-700 rounded text-[10px] font-mono border border-blue-200">
+                              ${so.invoiceId}
+                            </button>
+                          `}
+                        </td>
+                      </tr>
+                    `;
+                  }).join('')}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
+    function updateSoStatus(soId, status) {
+      const so = db.salesOrders.find(s => s.id === soId);
+      if (so) {
+        so.status = status;
+        saveDb();
+        showNotification(`Order status updated to: ${status}`);
+      }
+    }
+
+    function convertSoToInvoice(soId) {
+      const so = db.salesOrders.find(s => s.id === soId);
+      if (!so) return;
+
+      const newInvId = getNextSequentialId('INV', db.invoices);
+      db.invoices.push({
+        id: newInvId,
+        soId: so.id,
+        date: new Date().toISOString().split('T')[0],
+        dueDate: new Date(Date.now() + 15 * 86400000).toISOString().split('T')[0],
+        customerId: so.customerId,
+        customerName: so.customerName,
+        items: JSON.parse(JSON.stringify(so.items)),
+        taxableSubtotal: so.taxableSubtotal,
+        cgst: so.cgst,
+        sgst: so.sgst,
+        totalGst: so.totalGst,
+        grandTotal: so.grandTotal
+      });
+
+      so.invoiceId = newInvId;
+      saveDb();
+      showNotification(`Tax Invoice ${newInvId} created from ${so.id}`);
+      navigateTo('invoices');
+    }
+
+    /* ------------------------------------------------------------------
+       MODULE 5: TAX INVOICES
+       ------------------------------------------------------------------ */
+    function renderInvoicesView(el) {
+      const items = sortBySequence(db.invoices);
+
+      el.innerHTML = `
+        <div class="space-y-4 max-w-6xl mx-auto">
+          <div class="flex items-center justify-between">
+            <div>
+              <h3 class="font-bold text-slate-900 text-sm">GST Tax Invoices</h3>
+              <p class="text-xs text-slate-500">Official GST tax invoices with CGST/SGST breakdowns and balance settlement</p>
+            </div>
+            <button onclick="openNewInvoiceModal()" class="px-3.5 py-1.5 bg-slate-900 hover:bg-black text-white rounded-lg text-xs font-semibold flex items-center shadow-xs">
+              <i data-lucide="plus" class="w-3.5 h-3.5 mr-1.5"></i> Direct Tax Invoice
+            </button>
+          </div>
+
+          <div class="bg-white rounded-xl border border-slate-200 shadow-xs overflow-hidden">
+            <div class="overflow-x-auto">
+              <table class="w-full text-left text-xs">
+                <thead class="bg-slate-50 text-slate-500 uppercase text-[11px] font-semibold border-b border-slate-200">
+                  <tr>
+                    <th class="py-3 px-4">Invoice #</th>
+                    <th class="py-3 px-4">Date</th>
+                    <th class="py-3 px-4">Order Ref</th>
+                    <th class="py-3 px-4">Customer Farm</th>
+                    <th class="py-3 px-4">Total Amount</th>
+                    <th class="py-3 px-4">Paid</th>
+                    <th class="py-3 px-4">Remaining Balance</th>
+                    <th class="py-3 px-4">Status</th>
+                    <th class="py-3 px-4 text-right">Actions</th>
+                  </tr>
+                </thead>
+                <tbody class="divide-y divide-slate-100">
+                  ${items.map(inv => {
+                    const fin = getDocumentFinancials(inv.id);
+                    return `
+                      <tr class="hover:bg-slate-50/70 transition">
+                        <td class="py-3.5 px-4 font-mono font-semibold text-slate-900">${inv.id}</td>
+                        <td class="py-3.5 px-4 text-slate-600">${formatDate(inv.date)}</td>
+                        <td class="py-3.5 px-4 font-mono text-slate-500">${inv.soId || 'Direct'}</td>
+                        <td class="py-3.5 px-4 font-medium text-slate-900">${inv.customerName}</td>
+                        <td class="py-3.5 px-4 font-semibold text-slate-900">${formatCurrency(fin.grandTotal)}</td>
+                        <td class="py-3.5 px-4 font-semibold text-emerald-600">${formatCurrency(fin.totalPaid)}</td>
+                        <td class="py-3.5 px-4 font-bold ${fin.remainingBalance > 0 ? 'text-amber-600' : 'text-slate-400'}">
+                          ${formatCurrency(fin.remainingBalance)}
+                        </td>
+                        <td class="py-3.5 px-4">
+                          ${renderStatusPill(fin.status, fin.remainingBalance)}
+                        </td>
+                        <td class="py-3.5 px-4 text-right space-x-1.5 whitespace-nowrap">
+                          <button onclick="previewDocument('invoice', '${inv.id}')" title="View Document" class="p-1 text-slate-600 hover:text-slate-900">
+                            <i data-lucide="eye" class="w-4 h-4 inline"></i>
+                          </button>
+                          ${fin.remainingBalance > 0 ? `
+                            <button onclick="openPaymentModal('${inv.id}')" class="px-2.5 py-1 bg-emerald-600 hover:bg-emerald-700 text-white rounded text-[11px] font-semibold">
+                              Record Pay
+                            </button>
+                          ` : ''}
+                        </td>
+                      </tr>
+                    `;
+                  }).join('')}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
+    /* ------------------------------------------------------------------
+       MODULE 6: PAYMENT RECEIPTS
+       ------------------------------------------------------------------ */
+    function renderPaymentsView(el) {
+      const items = sortBySequence(db.payments);
+
+      el.innerHTML = `
+        <div class="space-y-4 max-w-6xl mx-auto">
+          <div class="flex items-center justify-between">
+            <div>
+              <h3 class="font-bold text-slate-900 text-sm">Payment Receipts Ledger</h3>
+            </div>
+            <button onclick="openPaymentModal()" class="px-3.5 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg text-xs font-semibold flex items-center shadow-xs">
+              <i data-lucide="plus" class="w-3.5 h-3.5 mr-1.5"></i> Record Payment
+            </button>
+          </div>
+
+          <div class="bg-white rounded-xl border border-slate-200 shadow-xs overflow-hidden">
+            <div class="overflow-x-auto">
+              <table class="w-full text-left text-xs">
+                <thead class="bg-slate-50 text-slate-500 uppercase text-[11px] font-semibold border-b border-slate-200">
+                  <tr>
+                    <th class="py-3 px-4">Receipt #</th>
+                    <th class="py-3 px-4">Date</th>
+                    <th class="py-3 px-4">Reference Document</th>
+                    <th class="py-3 px-4">Customer Farm</th>
+                    <th class="py-3 px-4">Payment Method</th>
+                    <th class="py-3 px-4">Ref / UTR / Cheque</th>
+                    <th class="py-3 px-4 text-right">Amount Paid</th>
+                    <th class="py-3 px-4 text-right">Receipt</th>
+                  </tr>
+                </thead>
+                <tbody class="divide-y divide-slate-100">
+                  ${items.map(p => `
+                    <tr class="hover:bg-slate-50/70 transition">
+                      <td class="py-3.5 px-4 font-mono font-semibold text-slate-900">${p.id}</td>
+                      <td class="py-3.5 px-4 text-slate-600">${formatDate(p.date)}</td>
+                      <td class="py-3.5 px-4 font-mono font-semibold text-slate-800">${p.docId}</td>
+                      <td class="py-3.5 px-4 font-medium text-slate-900">${p.customerName}</td>
+                      <td class="py-3.5 px-4 text-slate-600">${p.method}</td>
+                      <td class="py-3.5 px-4 font-mono text-slate-500">${p.refNo || '-'}</td>
+                      <td class="py-3.5 px-4 text-right font-bold text-emerald-600">${formatCurrency(p.amount)}</td>
+                      <td class="py-3.5 px-4 text-right">
+                        <button onclick="previewDocument('receipt', '${p.id}')" title="Print Official Receipt" class="p-1 text-slate-600 hover:text-slate-900">
+                          <i data-lucide="printer" class="w-4 h-4 inline"></i>
+                        </button>
+                      </td>
+                    </tr>
+                  `).join('')}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
+    /* ------------------------------------------------------------------
+       MODULE 7: CUSTOMERS DIRECTORY
+       ------------------------------------------------------------------ */
+    function renderCustomersView(el) {
+      const items = sortBySequence(db.customers);
+
+      el.innerHTML = `
+        <div class="space-y-4 max-w-6xl mx-auto">
+          <div class="flex items-center justify-between">
+            <div>
+              <h3 class="font-bold text-slate-900 text-sm">Customer Poultry Farms & Integrators</h3>
+            </div>
+            <button onclick="openNewCustomerModal()" class="px-3.5 py-1.5 bg-slate-900 hover:bg-black text-white rounded-lg text-xs font-semibold flex items-center shadow-xs">
+              <i data-lucide="plus" class="w-3.5 h-3.5 mr-1.5"></i> Add Customer
+            </button>
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            ${items.map(c => `
+              <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-xs flex flex-col justify-between">
+                <div>
+                  <div class="flex justify-between items-start">
+                    <span class="font-mono text-xs text-slate-400 font-semibold">${c.id}</span>
+                    <span class="text-[11px] font-mono bg-slate-100 text-slate-800 px-2 py-0.5 rounded font-medium border border-slate-200">GST: ${c.gstin}</span>
+                  </div>
+                  <h4 class="font-bold text-slate-900 text-base mt-2">${c.name}</h4>
+                  <p class="text-xs text-slate-700 mt-1">Contact: <strong>${c.contactPerson}</strong> (${c.phone})</p>
+                  <p class="text-xs text-slate-500 mt-1.5 leading-relaxed">${c.address}</p>
+                </div>
+              </div>
+            `).join('')}
+          </div>
+        </div>
+      `;
+    }
+
+    /* ------------------------------------------------------------------
+       MODULE 8: PURCHASE ORDERS (PO)
+       ------------------------------------------------------------------ */
+    function renderPurchaseOrdersView(el) {
+      const items = sortBySequence(db.pos);
+
+      el.innerHTML = `
+        <div class="space-y-4 max-w-6xl mx-auto">
+          <div class="flex items-center justify-between">
+            <div>
+              <h3 class="font-bold text-slate-900 text-sm">Purchase Orders (PO)</h3>
+            </div>
+            <button onclick="openNewPOModal()" class="px-3.5 py-1.5 bg-slate-900 hover:bg-black text-white rounded-lg text-xs font-semibold flex items-center shadow-xs">
+              <i data-lucide="plus" class="w-3.5 h-3.5 mr-1.5"></i> New Purchase Order
+            </button>
+          </div>
+
+          <div class="bg-white rounded-xl border border-slate-200 shadow-xs overflow-hidden">
+            <div class="overflow-x-auto">
+              <table class="w-full text-left text-xs">
+                <thead class="bg-slate-50 text-slate-500 uppercase text-[11px] font-semibold border-b border-slate-200">
+                  <tr>
+                    <th class="py-3 px-4">PO #</th>
+                    <th class="py-3 px-4">Date</th>
+                    <th class="py-3 px-4">Supplier / Vendor</th>
+                    <th class="py-3 px-4">Total Amount</th>
+                    <th class="py-3 px-4">Delivery Due</th>
+                    <th class="py-3 px-4">Status</th>
+                    <th class="py-3 px-4 text-right">Actions</th>
+                  </tr>
+                </thead>
+                <tbody class="divide-y divide-slate-100">
+                  ${items.map(p => `
+                    <tr class="hover:bg-slate-50/70 transition">
+                      <td class="py-3.5 px-4 font-mono font-semibold text-slate-900">${p.id}</td>
+                      <td class="py-3.5 px-4 text-slate-600">${formatDate(p.date)}</td>
+                      <td class="py-3.5 px-4 font-medium text-slate-900">${p.vendorName}</td>
+                      <td class="py-3.5 px-4 font-bold text-slate-900">${formatCurrency(p.grandTotal)}</td>
+                      <td class="py-3.5 px-4 text-slate-600">${formatDate(p.deliveryDate)}</td>
+                      <td class="py-3.5 px-4">
+                        <span class="inline-flex px-2 py-0.5 rounded text-[11px] font-medium ${p.status === 'Received' ? 'bg-emerald-50 text-emerald-700 border border-emerald-200' : 'bg-slate-100 text-slate-700'}">
+                          ${p.status}
+                        </span>
+                      </td>
+                      <td class="py-3.5 px-4 text-right">
+                        <button onclick="previewDocument('po', '${p.id}')" title="Print PO" class="p-1 text-slate-600 hover:text-slate-900">
+                          <i data-lucide="eye" class="w-4 h-4 inline"></i>
+                        </button>
+                      </td>
+                    </tr>
+                  `).join('')}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
+    /* ------------------------------------------------------------------
+       MODULE 9: EXPENSES
+       ------------------------------------------------------------------ */
+    function renderExpensesView(el) {
+      const items = sortBySequence(db.expenses);
+
+      el.innerHTML = `
+        <div class="space-y-4 max-w-6xl mx-auto">
+          <div class="flex items-center justify-between">
+            <div>
+              <h3 class="font-bold text-slate-900 text-sm">Workshop Expenses Ledger</h3>
+            </div>
+            <button onclick="openNewExpenseModal()" class="px-3.5 py-1.5 bg-slate-900 hover:bg-black text-white rounded-lg text-xs font-semibold flex items-center shadow-xs">
+              <i data-lucide="plus" class="w-3.5 h-3.5 mr-1.5"></i> Log Workshop Expense
+            </button>
+          </div>
+
+          <div class="bg-white rounded-xl border border-slate-200 shadow-xs overflow-hidden">
+            <div class="overflow-x-auto">
+              <table class="w-full text-left text-xs">
+                <thead class="bg-slate-50 text-slate-500 uppercase text-[11px] font-semibold border-b border-slate-200">
+                  <tr>
+                    <th class="py-3 px-4">Expense #</th>
+                    <th class="py-3 px-4">Date</th>
+                    <th class="py-3 px-4">Category</th>
+                    <th class="py-3 px-4">Description</th>
+                    <th class="py-3 px-4">Payment Method</th>
+                    <th class="py-3 px-4 text-right">Amount</th>
+                  </tr>
+                </thead>
+                <tbody class="divide-y divide-slate-100">
+                  ${items.map(e => `
+                    <tr class="hover:bg-slate-50/70 transition">
+                      <td class="py-3.5 px-4 font-mono font-semibold text-slate-900">${e.id}</td>
+                      <td class="py-3.5 px-4 text-slate-600">${formatDate(e.date)}</td>
+                      <td class="py-3.5 px-4 font-medium text-slate-800">${e.category}</td>
+                      <td class="py-3.5 px-4 text-slate-600">${e.description}</td>
+                      <td class="py-3.5 px-4 text-slate-600">${e.method}</td>
+                      <td class="py-3.5 px-4 font-bold text-slate-900 text-right">${formatCurrency(e.amount)}</td>
+                    </tr>
+                  `).join('')}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
+    /* ------------------------------------------------------------------
+       5. MODAL LOGIC: RECORD PAYMENTS (WITH LIVE BALANCE UPDATE)
+       ------------------------------------------------------------------ */
+    function openPaymentModal(preselectedDocId = null) {
+      const backdrop = document.getElementById('form-modal-backdrop');
+      const box = document.getElementById('form-modal-box');
+      const nextReceiptId = getNextSequentialId('REC', db.payments);
+
+      const options = [];
+      sortBySequence(db.salesOrders).forEach(so => {
+        const fin = getDocumentFinancials(so.id);
+        options.push({
+          id: so.id,
+          label: `${so.id} - ${so.customerName} (Total: ${formatCurrency(fin.grandTotal)} | Balance: ${formatCurrency(fin.remainingBalance)})`,
+          total: fin.grandTotal,
+          paid: fin.totalPaid,
+          balance: fin.remainingBalance,
+          customer: so.customerName
+        });
+      });
+
+      sortBySequence(db.invoices).forEach(inv => {
+        const fin = getDocumentFinancials(inv.id);
+        options.push({
+          id: inv.id,
+          label: `${inv.id} - ${inv.customerName} (Total: ${formatCurrency(fin.grandTotal)} | Balance: ${formatCurrency(fin.remainingBalance)})`,
+          total: fin.grandTotal,
+          paid: fin.totalPaid,
+          balance: fin.remainingBalance,
+          customer: inv.customerName
+        });
+      });
+
+      box.innerHTML = `
+        <div class="h-14 px-5 border-b border-slate-200 flex items-center justify-between bg-white flex-shrink-0">
+          <div>
+            <h3 class="font-bold text-slate-900 text-sm">Record Payment</h3>
+            <p class="text-[11px] text-slate-500">Official Receipt ID: <span class="font-mono font-semibold text-slate-800">${nextReceiptId}</span></p>
+          </div>
+          <button onclick="closeFormModal()" class="p-1 text-slate-400 hover:text-slate-800 rounded">
+            <i data-lucide="x" class="w-4 h-4"></i>
+          </button>
+        </div>
+
+        <form onsubmit="savePaymentForm(event, '${nextReceiptId}')" class="p-5 overflow-y-auto space-y-4">
+          <div>
+            <label class="block text-xs font-semibold text-slate-700 mb-1">Target Sales Order or Tax Invoice</label>
+            <select id="pay-doc-selector" onchange="onPaymentDocChange()" required class="w-full bg-white border border-slate-300 rounded-lg text-xs p-2.5">
+              <option value="">-- Select Order or Invoice --</option>
+              ${options.map(opt => `
+                <option value="${opt.id}" data-total="${opt.total}" data-paid="${opt.paid}" data-balance="${opt.balance}" data-customer="${opt.customer}" ${preselectedDocId === opt.id ? 'selected' : ''}>
+                  ${opt.label}
+                </option>
+              `).join('')}
+            </select>
+          </div>
+
+          <div class="bg-slate-50 p-3.5 rounded-lg border border-slate-200 space-y-2 text-xs">
+            <div class="flex justify-between text-slate-600">
+              <span>Total Document Value:</span>
+              <span id="pay-disp-total" class="font-semibold text-slate-900">₹ 0</span>
+            </div>
+            <div class="flex justify-between text-slate-600">
+              <span>Already Paid Amount:</span>
+              <span id="pay-disp-paid" class="font-semibold text-emerald-600">₹ 0</span>
+            </div>
+            <div class="flex justify-between pt-1 border-t border-slate-200 text-slate-800">
+              <span class="font-semibold">Current Remaining Balance:</span>
+              <span id="pay-disp-balance" class="font-bold text-amber-600 text-sm">₹ 0</span>
+            </div>
+            <div id="pay-disp-live-row" class="hidden flex justify-between pt-1 border-t border-dashed border-slate-300 text-slate-900">
+              <span class="font-semibold">Remaining After This Payment:</span>
+              <span id="pay-disp-live-balance" class="font-bold">₹ 0</span>
+            </div>
+          </div>
+
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div>
+              <div class="flex justify-between items-center mb-1">
+                <label class="text-xs font-semibold text-slate-700">Payment Amount Received (₹)</label>
+                <button type="button" onclick="setFullBalancePay()" class="text-[11px] text-emerald-600 font-semibold hover:underline">
+                  Pay Full Balance
+                </button>
+              </div>
+              <input type="number" id="pay-amount-input" min="1" step="1" oninput="calcLiveRemainingBalance()" required class="w-full bg-white border border-slate-300 rounded-lg text-xs p-2.5 font-bold text-slate-900">
+            </div>
+
+            <div>
+              <label class="block text-xs font-semibold text-slate-700 mb-1">Payment Date</label>
+              <input type="date" id="pay-date-input" value="${new Date().toISOString().split('T')[0]}" required class="w-full bg-white border border-slate-300 rounded-lg text-xs p-2.5">
+            </div>
+          </div>
+
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div>
+              <label class="block text-xs font-semibold text-slate-700 mb-1">Payment Method</label>
+              <select id="pay-method-select" class="w-full bg-white border border-slate-300 rounded-lg text-xs p-2.5">
+                <option value="Bank Transfer (NEFT/RTGS)">Bank Transfer (NEFT/RTGS)</option>
+                <option value="UPI">UPI (GPay / PhonePe / Paytm)</option>
+                <option value="Cheque">Bank Cheque</option>
+                <option value="Cash">Cash</option>
+              </select>
+            </div>
+            <div>
+              <label class="block text-xs font-semibold text-slate-700 mb-1">Reference / UTR / Cheque Number</label>
+              <input type="text" id="pay-ref-input" placeholder="e.g. UTR / CHQ-1002" required class="w-full bg-white border border-slate-300 rounded-lg text-xs p-2.5 font-mono">
+            </div>
+          </div>
+
+          <div>
+            <label class="block text-xs font-semibold text-slate-700 mb-1">Notes (Optional)</label>
+            <input type="text" id="pay-notes-input" placeholder="e.g. 50% advance for hammer mill fabrication" class="w-full bg-white border border-slate-300 rounded-lg text-xs p-2.5">
+          </div>
+
+          <div class="flex justify-end space-x-2 pt-3 border-t border-slate-200">
+            <button type="button" onclick="closeFormModal()" class="px-3.5 py-2 border border-slate-300 rounded-lg text-xs font-semibold text-slate-700 hover:bg-slate-50">Cancel</button>
+            <button type="submit" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg text-xs font-semibold shadow-xs">Save Payment & Issue Receipt</button>
+          </div>
+        </form>
+      `;
+
+      backdrop.classList.remove('hidden');
+      lucide.createIcons();
+      onPaymentDocChange();
+    }
+
+    function onPaymentDocChange() {
+      const select = document.getElementById('pay-doc-selector');
+      const opt = select.options[select.selectedIndex];
+      if (opt && opt.value) {
+        const total = Number(opt.getAttribute('data-total')) || 0;
+        const paid = Number(opt.getAttribute('data-paid')) || 0;
+        const balance = Number(opt.getAttribute('data-balance')) || 0;
+
+        document.getElementById('pay-disp-total').textContent = formatCurrency(total);
+        document.getElementById('pay-disp-paid').textContent = formatCurrency(paid);
+        document.getElementById('pay-disp-balance').textContent = formatCurrency(balance);
+
+        const amtInput = document.getElementById('pay-amount-input');
+        if (!amtInput.value || Number(amtInput.value) > balance) {
+          amtInput.value = balance;
+        }
+        calcLiveRemainingBalance();
+      } else {
+        document.getElementById('pay-disp-total').textContent = '₹ 0';
+        document.getElementById('pay-disp-paid').textContent = '₹ 0';
+        document.getElementById('pay-disp-balance').textContent = '₹ 0';
+        document.getElementById('pay-disp-live-row').classList.add('hidden');
+      }
+    }
+
+    function setFullBalancePay() {
+      const select = document.getElementById('pay-doc-selector');
+      const opt = select.options[select.selectedIndex];
+      if (opt && opt.value) {
+        const balance = Number(opt.getAttribute('data-balance')) || 0;
+        document.getElementById('pay-amount-input').value = balance;
+        calcLiveRemainingBalance();
+      }
+    }
+
+    function calcLiveRemainingBalance() {
+      const select = document.getElementById('pay-doc-selector');
+      const opt = select.options[select.selectedIndex];
+      const amtInput = document.getElementById('pay-amount-input');
+      const liveRow = document.getElementById('pay-disp-live-row');
+      const liveSpan = document.getElementById('pay-disp-live-balance');
+
+      if (!opt || !opt.value) return;
+      const balance = Number(opt.getAttribute('data-balance')) || 0;
+      const paying = Number(amtInput.value) || 0;
+
+      if (paying > 0) {
+        liveRow.classList.remove('hidden');
+        const rem = Math.max(0, balance - paying);
+        if (rem === 0) {
+          liveSpan.innerHTML = `<span class="text-emerald-600 font-bold">₹ 0 (Fully Settled)</span>`;
+        } else {
+          liveSpan.innerHTML = `<span class="text-amber-600 font-bold">${formatCurrency(rem)} (Partial)</span>`;
+        }
+      } else {
+        liveRow.classList.add('hidden');
+      }
+    }
+
+    function savePaymentForm(e, nextReceiptId) {
+      e.preventDefault();
+      const select = document.getElementById('pay-doc-selector');
+      const opt = select.options[select.selectedIndex];
+      if (!opt || !opt.value) return;
+
+      const docId = opt.value;
+      const customerName = opt.getAttribute('data-customer');
+      const amount = Number(document.getElementById('pay-amount-input').value) || 0;
+      const date = document.getElementById('pay-date-input').value;
+      const method = document.getElementById('pay-method-select').value;
+      const refNo = document.getElementById('pay-ref-input').value;
+      const notes = document.getElementById('pay-notes-input').value;
+
+      if (amount <= 0) {
+        showNotification("Please enter a valid amount.");
+        return;
+      }
+
+      db.payments.push({
+        id: nextReceiptId,
+        date,
+        docId,
+        customerName,
+        amount,
+        method,
+        refNo,
+        notes
+      });
+
+      saveDb();
+      closeFormModal();
+      showNotification(`Payment recorded. Receipt ${nextReceiptId} generated.`);
+      navigateTo('payments');
+    }
+
+    /* ------------------------------------------------------------------
+       6. LINE-ITEM MODAL CREATION (SELECT FROM MACHINE CATALOG)
+       ------------------------------------------------------------------ */
+    function openNewQuotationModal() {
+      const backdrop = document.getElementById('form-modal-backdrop');
+      const box = document.getElementById('form-modal-box');
+      const nextId = getNextSequentialId('QT', db.quotations);
+
+      box.innerHTML = `
+        <div class="h-14 px-5 border-b border-slate-200 flex items-center justify-between bg-white flex-shrink-0">
+          <h3 class="font-bold text-slate-900 text-sm">New Machinery Quotation (${nextId})</h3>
+          <button onclick="closeFormModal()" class="p-1 text-slate-400 hover:text-slate-800 rounded">
+            <i data-lucide="x" class="w-4 h-4"></i>
+          </button>
+        </div>
+
+        <form onsubmit="saveQuotationForm(event, '${nextId}')" class="p-5 overflow-y-auto space-y-4">
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div>
+              <label class="block text-xs font-semibold text-slate-700 mb-1">Customer / Poultry Farm</label>
+              <select id="form-q-customer" required class="w-full bg-white border border-slate-300 rounded-lg text-xs p-2.5">
+                <option value="">-- Choose Customer --</option>
+                ${sortBySequence(db.customers).map(c => `<option value="${c.id}">${c.name}</option>`).join('')}
+              </select>
+            </div>
+            <div>
+              <label class="block text-xs font-semibold text-slate-700 mb-1">Quotation Date</label>
+              <input type="date" id="form-q-date" value="${new Date().toISOString().split('T')[0]}" required class="w-full bg-white border border-slate-300 rounded-lg text-xs p-2.5">
+            </div>
+          </div>
+
+          <!-- Line Items Section with Machinery Dropdown -->
+          <div class="border border-slate-200 rounded-xl p-3 bg-slate-50/50 space-y-3">
+            <div class="flex justify-between items-center">
+              <span class="font-bold text-xs text-slate-900">Poultry Machinery Line Items</span>
+              <button type="button" onclick="addNewMachineRow()" class="text-xs font-semibold text-emerald-700 hover:underline">
+                + Add Machine Line
+              </button>
+            </div>
+            <div id="line-items-wrapper" class="space-y-2">
+              <!-- Injected dynamically -->
+            </div>
+          </div>
+
+          <!-- Total Calculations -->
+          <div class="bg-slate-50 p-3.5 rounded-lg border border-slate-200 text-xs space-y-1.5">
+            <div class="flex justify-between text-slate-600">
+              <span>Taxable Value:</span>
+              <span id="calc-taxable-disp" class="font-semibold text-slate-900">₹ 0</span>
+            </div>
+            <div class="flex justify-between text-slate-600">
+              <span>CGST + SGST (Calculated from enterable %):</span>
+              <span id="calc-gst-disp" class="font-semibold text-slate-900">₹ 0</span>
+            </div>
+            <div class="flex justify-between pt-1 border-t border-slate-200 font-bold text-slate-900 text-sm">
+              <span>Grand Total Quotation Amount:</span>
+              <span id="calc-grand-disp" class="text-emerald-700">₹ 0</span>
+            </div>
+          </div>
+
+          <div class="flex justify-end space-x-2 pt-2 border-t border-slate-200">
+            <button type="button" onclick="closeFormModal()" class="px-3.5 py-2 border border-slate-300 rounded-lg text-xs font-semibold text-slate-700 hover:bg-slate-50">Cancel</button>
+            <button type="submit" class="px-4 py-2 bg-slate-900 hover:bg-black text-white rounded-lg text-xs font-semibold">Generate Quotation</button>
+          </div>
+        </form>
+      `;
+
+      backdrop.classList.remove('hidden');
+      lucide.createIcons();
+      addNewMachineRow();
+    }
+
+    function addNewMachineRow() {
+      const container = document.getElementById('line-items-wrapper');
+      const rowId = 'row-' + Date.now() + Math.random().toString(36).substring(2, 5);
+      const div = document.createElement('div');
+      div.id = rowId;
+      div.className = 'grid grid-cols-12 gap-2 bg-white p-2.5 rounded-lg border border-slate-200 items-start item-entry-row';
+
+      const machineOptions = db.machines.map(m => `
+        <option value="${m.id}" data-name="${m.name}" data-motor="${m.motor}" data-capacity="${m.capacity}" data-price="${m.price}" data-hsn="${m.hsn}" data-gstr="${m.gstRate}">
+          ${m.name} (${m.motor})
+        </option>
+      `).join('');
+
+      div.innerHTML = `
+        <div class="col-span-12 sm:col-span-4">
+          <label class="block text-[10px] text-slate-400 font-semibold mb-0.5">Select Machine Model</label>
+          <select class="row-mch-select w-full bg-white border border-slate-300 rounded text-xs p-1.5 font-medium" onchange="syncRowMachine('${rowId}')">
+            ${machineOptions}
+          </select>
+          <input type="text" class="row-specs w-full bg-slate-50 border border-slate-200 rounded text-[11px] p-1 mt-1 text-slate-600" placeholder="Specs & Capacity">
+        </div>
+        <div class="col-span-4 sm:col-span-2">
+          <label class="block text-[10px] text-slate-400 font-semibold mb-0.5">HSN Code</label>
+          <input type="text" class="row-hsn w-full bg-white border border-slate-300 rounded text-xs p-1.5 font-mono" value="8436">
+        </div>
+        <div class="col-span-4 sm:col-span-2">
+          <label class="block text-[10px] text-slate-400 font-semibold mb-0.5">Rate / Machine (₹)</label>
+          <input type="number" min="0" class="row-price w-full bg-white border border-slate-300 rounded text-xs p-1.5 font-semibold" oninput="recalculateFormTotals()">
+        </div>
+        <div class="col-span-4 sm:col-span-1">
+          <label class="block text-[10px] text-slate-400 font-semibold mb-0.5">Qty</label>
+          <input type="number" min="1" value="1" class="row-qty w-full bg-white border border-slate-300 rounded text-xs p-1.5 text-center font-bold" oninput="recalculateFormTotals()">
+        </div>
+        <div class="col-span-8 sm:col-span-2">
+          <label class="block text-[10px] text-slate-400 font-semibold mb-0.5">GST Rate (%)</label>
+          <input type="number" min="0" max="28" value="18" class="row-gst-rate w-full bg-white border border-slate-300 rounded text-xs p-1.5 text-center font-bold" oninput="recalculateFormTotals()">
+        </div>
+        <div class="col-span-4 sm:col-span-1 text-right pt-4">
+          <button type="button" onclick="document.getElementById('${rowId}').remove(); recalculateFormTotals();" class="p-1 text-slate-400 hover:text-red-600">
+            <i data-lucide="trash-2" class="w-4 h-4"></i>
+          </button>
+        </div>
+      `;
+
+      container.appendChild(div);
+      lucide.createIcons();
+      syncRowMachine(rowId);
+    }
+
+    function syncRowMachine(rowId) {
+      const row = document.getElementById(rowId);
+      if (!row) return;
+      const select = row.querySelector('.row-mch-select');
+      const opt = select.options[select.selectedIndex];
+      if (opt) {
+        row.querySelector('.row-price').value = opt.getAttribute('data-price') || 0;
+        row.querySelector('.row-hsn').value = opt.getAttribute('data-hsn') || '8436';
+        row.querySelector('.row-gst-rate').value = opt.getAttribute('data-gstr') || 18;
+        const motor = opt.getAttribute('data-motor') || '';
+        const capacity = opt.getAttribute('data-capacity') || '';
+        row.querySelector('.row-specs').value = `${motor} | ${capacity}`;
+      }
+      recalculateFormTotals();
+    }
+
+    function recalculateFormTotals() {
+      let taxableSubtotal = 0;
+      let totalGst = 0;
+
+      document.querySelectorAll('.item-entry-row').forEach(row => {
+        const price = Number(row.querySelector('.row-price').value) || 0;
+        const qty = Number(row.querySelector('.row-qty').value) || 1;
+        const gstRate = Number(row.querySelector('.row-gst-rate').value) || 0;
+
+        const lineTaxable = price * qty;
+        const lineGst = Math.round(lineTaxable * (gstRate / 100));
+
+        taxableSubtotal += lineTaxable;
+        totalGst += lineGst;
+      });
+
+      const grandTotal = taxableSubtotal + totalGst;
+
+      const taxableDisp = document.getElementById('calc-taxable-disp');
+      const gstDisp = document.getElementById('calc-gst-disp');
+      const grandDisp = document.getElementById('calc-grand-disp');
+
+      if (taxableDisp) taxableDisp.textContent = formatCurrency(taxableSubtotal);
+      if (gstDisp) gstDisp.textContent = formatCurrency(totalGst);
+      if (grandDisp) grandDisp.textContent = formatCurrency(grandTotal);
+    }
+
+    function saveQuotationForm(e, nextId) {
+      e.preventDefault();
+      const custId = document.getElementById('form-q-customer').value;
+      const cust = db.customers.find(c => c.id === custId);
+      if (!cust) return;
+
+      const items = [];
+      let taxableSubtotal = 0;
+      let totalGst = 0;
+
+      document.querySelectorAll('.item-entry-row').forEach(row => {
+        const select = row.querySelector('.row-mch-select');
+        const opt = select.options[select.selectedIndex];
+        const machineId = opt ? opt.value : 'MCH-001';
+        const name = opt ? opt.getAttribute('data-name') : 'Poultry Machine';
+        const specs = row.querySelector('.row-specs').value || '';
+        const hsn = row.querySelector('.row-hsn').value || '8436';
+        const price = Number(row.querySelector('.row-price').value) || 0;
+        const qty = Number(row.querySelector('.row-qty').value) || 1;
+        const gstRate = Number(row.querySelector('.row-gst-rate').value) || 0;
+
+        const taxable = price * qty;
+        const gstAmount = Math.round(taxable * (gstRate / 100));
+        const total = taxable + gstAmount;
+
+        taxableSubtotal += taxable;
+        totalGst += gstAmount;
+
+        items.push({ machineId, name, specs, hsn, qty, price, taxable, gstRate, gstAmount, total });
+      });
+
+      const cgst = Math.round(totalGst / 2);
+      const sgst = Math.round(totalGst / 2);
+      const grandTotal = taxableSubtotal + totalGst;
+
+      db.quotations.push({
+        id: nextId,
+        date: document.getElementById('form-q-date').value,
+        customerId: cust.id,
+        customerName: cust.name,
+        items,
+        taxableSubtotal,
+        cgst,
+        sgst,
+        totalGst,
+        grandTotal,
+        status: 'Pending'
+      });
+
+      saveDb();
+      closeFormModal();
+      showNotification(`Quotation ${nextId} created successfully.`);
+      navigateTo('quotations');
+    }
+
+    /* DIRECT SALES ORDER MODAL */
+    function openNewSalesOrderModal() {
+      const backdrop = document.getElementById('form-modal-backdrop');
+      const box = document.getElementById('form-modal-box');
+      const nextId = getNextSequentialId('SO', db.salesOrders);
+
+      box.innerHTML = `
+        <div class="h-14 px-5 border-b border-slate-200 flex items-center justify-between bg-white flex-shrink-0">
+          <h3 class="font-bold text-slate-900 text-sm">Direct Sales Order (${nextId})</h3>
+          <button onclick="closeFormModal()" class="p-1 text-slate-400 hover:text-slate-800 rounded">
+            <i data-lucide="x" class="w-4 h-4"></i>
+          </button>
+        </div>
+
+        <form onsubmit="saveDirectSoForm(event, '${nextId}')" class="p-5 overflow-y-auto space-y-4">
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div>
+              <label class="block text-xs font-semibold text-slate-700 mb-1">Customer / Farm</label>
+              <select id="form-so-cust" required class="w-full bg-white border border-slate-300 rounded-lg text-xs p-2.5">
+                <option value="">-- Choose Customer --</option>
+                ${sortBySequence(db.customers).map(c => `<option value="${c.id}">${c.name}</option>`).join('')}
+              </select>
+            </div>
+            <div>
+              <label class="block text-xs font-semibold text-slate-700 mb-1">Delivery Due Date</label>
+              <input type="date" id="form-so-delivery" value="${new Date(Date.now() + 15 * 86400000).toISOString().split('T')[0]}" required class="w-full bg-white border border-slate-300 rounded-lg text-xs p-2.5">
+            </div>
+          </div>
+
+          <!-- Line Items Section with Machinery Dropdown -->
+          <div class="border border-slate-200 rounded-xl p-3 bg-slate-50/50 space-y-3">
+            <div class="flex justify-between items-center">
+              <span class="font-bold text-xs text-slate-900">Poultry Machinery Order Items</span>
+              <button type="button" onclick="addNewMachineRow()" class="text-xs font-semibold text-emerald-700 hover:underline">
+                + Add Machine Line
+              </button>
+            </div>
+            <div id="line-items-wrapper" class="space-y-2"></div>
+          </div>
+
+          <!-- Total Calculations -->
+          <div class="bg-slate-50 p-3.5 rounded-lg border border-slate-200 text-xs space-y-1.5">
+            <div class="flex justify-between text-slate-600">
+              <span>Taxable Value:</span>
+              <span id="calc-taxable-disp" class="font-semibold text-slate-900">₹ 0</span>
+            </div>
+            <div class="flex justify-between text-slate-600">
+              <span>Total GST:</span>
+              <span id="calc-gst-disp" class="font-semibold text-slate-900">₹ 0</span>
+            </div>
+            <div class="flex justify-between pt-1 border-t border-slate-200 font-bold text-slate-900 text-sm">
+              <span>Grand Total Amount:</span>
+              <span id="calc-grand-disp" class="text-emerald-700">₹ 0</span>
+            </div>
+          </div>
+
+          <div class="flex justify-end space-x-2 pt-2 border-t border-slate-200">
+            <button type="button" onclick="closeFormModal()" class="px-3.5 py-2 border border-slate-300 rounded-lg text-xs font-semibold text-slate-700 hover:bg-slate-50">Cancel</button>
+            <button type="submit" class="px-4 py-2 bg-slate-900 hover:bg-black text-white rounded-lg text-xs font-semibold">Save Sales Order</button>
+          </div>
+        </form>
+      `;
+
+      backdrop.classList.remove('hidden');
+      lucide.createIcons();
+      addNewMachineRow();
+    }
+
+    function saveDirectSoForm(e, nextId) {
+      e.preventDefault();
+      const custId = document.getElementById('form-so-cust').value;
+      const cust = db.customers.find(c => c.id === custId);
+      if (!cust) return;
+
+      const items = [];
+      let taxableSubtotal = 0;
+      let totalGst = 0;
+
+      document.querySelectorAll('.item-entry-row').forEach(row => {
+        const select = row.querySelector('.row-mch-select');
+        const opt = select.options[select.selectedIndex];
+        const machineId = opt ? opt.value : 'MCH-001';
+        const name = opt ? opt.getAttribute('data-name') : 'Poultry Machine';
+        const specs = row.querySelector('.row-specs').value || '';
+        const hsn = row.querySelector('.row-hsn').value || '8436';
+        const price = Number(row.querySelector('.row-price').value) || 0;
+        const qty = Number(row.querySelector('.row-qty').value) || 1;
+        const gstRate = Number(row.querySelector('.row-gst-rate').value) || 0;
+
+        const taxable = price * qty;
+        const gstAmount = Math.round(taxable * (gstRate / 100));
+        const total = taxable + gstAmount;
+
+        taxableSubtotal += taxable;
+        totalGst += gstAmount;
+
+        items.push({ machineId, name, specs, hsn, qty, price, taxable, gstRate, gstAmount, total });
+      });
+
+      const cgst = Math.round(totalGst / 2);
+      const sgst = Math.round(totalGst / 2);
+      const grandTotal = taxableSubtotal + totalGst;
+
+      db.salesOrders.push({
+        id: nextId,
+        quotationId: null,
+        date: new Date().toISOString().split('T')[0],
+        deliveryDate: document.getElementById('form-so-delivery').value,
+        customerId: cust.id,
+        customerName: cust.name,
+        items,
+        taxableSubtotal,
+        cgst,
+        sgst,
+        totalGst,
+        grandTotal,
+        status: 'In Production',
+        invoiceId: null
+      });
+
+      saveDb();
+      closeFormModal();
+      showNotification(`Sales Order ${nextId} created.`);
+      navigateTo('salesOrders');
+    }
+
+    /* DIRECT INVOICE MODAL */
+    function openNewInvoiceModal() {
+      const backdrop = document.getElementById('form-modal-backdrop');
+      const box = document.getElementById('form-modal-box');
+      const nextId = getNextSequentialId('INV', db.invoices);
+
+      box.innerHTML = `
+        <div class="h-14 px-5 border-b border-slate-200 flex items-center justify-between bg-white flex-shrink-0">
+          <h3 class="font-bold text-slate-900 text-sm">Direct Tax Invoice (${nextId})</h3>
+          <button onclick="closeFormModal()" class="p-1 text-slate-400 hover:text-slate-800 rounded">
+            <i data-lucide="x" class="w-4 h-4"></i>
+          </button>
+        </div>
+
+        <form onsubmit="saveDirectInvoiceForm(event, '${nextId}')" class="p-5 overflow-y-auto space-y-4">
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div>
+              <label class="block text-xs font-semibold text-slate-700 mb-1">Customer / Farm</label>
+              <select id="form-inv-cust" required class="w-full bg-white border border-slate-300 rounded-lg text-xs p-2.5">
+                <option value="">-- Choose Customer --</option>
+                ${sortBySequence(db.customers).map(c => `<option value="${c.id}">${c.name}</option>`).join('')}
+              </select>
+            </div>
+            <div>
+              <label class="block text-xs font-semibold text-slate-700 mb-1">Payment Due Date</label>
+              <input type="date" id="form-inv-due" value="${new Date(Date.now() + 15 * 86400000).toISOString().split('T')[0]}" required class="w-full bg-white border border-slate-300 rounded-lg text-xs p-2.5">
+            </div>
+          </div>
+
+          <!-- Line Items Section with Machinery Dropdown -->
+          <div class="border border-slate-200 rounded-xl p-3 bg-slate-50/50 space-y-3">
+            <div class="flex justify-between items-center">
+              <span class="font-bold text-xs text-slate-900">Machine Items</span>
+              <button type="button" onclick="addNewMachineRow()" class="text-xs font-semibold text-emerald-700 hover:underline">
+                + Add Machine Line
+              </button>
+            </div>
+            <div id="line-items-wrapper" class="space-y-2"></div>
+          </div>
+
+          <!-- Total Calculations -->
+          <div class="bg-slate-50 p-3.5 rounded-lg border border-slate-200 text-xs space-y-1.5">
+            <div class="flex justify-between text-slate-600">
+              <span>Taxable Subtotal:</span>
+              <span id="calc-taxable-disp" class="font-semibold text-slate-900">₹ 0</span>
+            </div>
+            <div class="flex justify-between text-slate-600">
+              <span>Total GST:</span>
+              <span id="calc-gst-disp" class="font-semibold text-slate-900">₹ 0</span>
+            </div>
+            <div class="flex justify-between pt-1 border-t border-slate-200 font-bold text-slate-900 text-sm">
+              <span>Invoice Grand Total:</span>
+              <span id="calc-grand-disp" class="text-emerald-700">₹ 0</span>
+            </div>
+          </div>
+
+          <div class="flex justify-end space-x-2 pt-2 border-t border-slate-200">
+            <button type="button" onclick="closeFormModal()" class="px-3.5 py-2 border border-slate-300 rounded-lg text-xs font-semibold text-slate-700 hover:bg-slate-50">Cancel</button>
+            <button type="submit" class="px-4 py-2 bg-slate-900 hover:bg-black text-white rounded-lg text-xs font-semibold">Generate Tax Invoice</button>
+          </div>
+        </form>
+      `;
+
+      backdrop.classList.remove('hidden');
+      lucide.createIcons();
+      addNewMachineRow();
+    }
+
+    function saveDirectInvoiceForm(e, nextId) {
+      e.preventDefault();
+      const custId = document.getElementById('form-inv-cust').value;
+      const cust = db.customers.find(c => c.id === custId);
+      if (!cust) return;
+
+      const items = [];
+      let taxableSubtotal = 0;
+      let totalGst = 0;
+
+      document.querySelectorAll('.item-entry-row').forEach(row => {
+        const select = row.querySelector('.row-mch-select');
+        const opt = select.options[select.selectedIndex];
+        const machineId = opt ? opt.value : 'MCH-001';
+        const name = opt ? opt.getAttribute('data-name') : 'Poultry Machine';
+        const specs = row.querySelector('.row-specs').value || '';
+        const hsn = row.querySelector('.row-hsn').value || '8436';
+        const price = Number(row.querySelector('.row-price').value) || 0;
+        const qty = Number(row.querySelector('.row-qty').value) || 1;
+        const gstRate = Number(row.querySelector('.row-gst-rate').value) || 0;
+
+        const taxable = price * qty;
+        const gstAmount = Math.round(taxable * (gstRate / 100));
+        const total = taxable + gstAmount;
+
+        taxableSubtotal += taxable;
+        totalGst += gstAmount;
+
+        items.push({ machineId, name, specs, hsn, qty, price, taxable, gstRate, gstAmount, total });
+      });
+
+      const cgst = Math.round(totalGst / 2);
+      const sgst = Math.round(totalGst / 2);
+      const grandTotal = taxableSubtotal + totalGst;
+
+      db.invoices.push({
+        id: nextId,
+        soId: null,
+        date: new Date().toISOString().split('T')[0],
+        dueDate: document.getElementById('form-inv-due').value,
+        customerId: cust.id,
+        customerName: cust.name,
+        items,
+        taxableSubtotal,
+        cgst,
+        sgst,
+        totalGst,
+        grandTotal
+      });
+
+      saveDb();
+      closeFormModal();
+      showNotification(`Tax Invoice ${nextId} created.`);
+      navigateTo('invoices');
+    }
+
+    /* CUSTOMER, PO & EXPENSE MODALS */
+    function openNewCustomerModal() {
+      const backdrop = document.getElementById('form-modal-backdrop');
+      const box = document.getElementById('form-modal-box');
+      const nextId = getNextSimpleId('CUST', db.customers);
+
+      box.innerHTML = `
+        <div class="h-14 px-5 border-b border-slate-200 flex items-center justify-between bg-white flex-shrink-0">
+          <h3 class="font-bold text-slate-900 text-sm">Add Customer Poultry Farm (${nextId})</h3>
+          <button onclick="closeFormModal()" class="p-1 text-slate-400 hover:text-slate-800 rounded">
+            <i data-lucide="x" class="w-4 h-4"></i>
+          </button>
+        </div>
+
+        <form onsubmit="saveCustomerForm(event, '${nextId}')" class="p-5 overflow-y-auto space-y-4">
+          <div>
+            <label class="block text-xs font-semibold text-slate-700 mb-1">Poultry Farm / Enterprise Name</label>
+            <input type="text" id="new-cust-name" placeholder="e.g. Godavari Agro Hatcheries" required class="w-full bg-white border border-slate-300 rounded-lg text-xs p-2.5">
+          </div>
+          <div class="grid grid-cols-2 gap-3">
+            <div>
+              <label class="block text-xs font-semibold text-slate-700 mb-1">Contact Person</label>
+              <input type="text" id="new-cust-person" placeholder="e.g. Pravin Kadam" required class="w-full bg-white border border-slate-300 rounded-lg text-xs p-2.5">
+            </div>
+            <div>
+              <label class="block text-xs font-semibold text-slate-700 mb-1">Phone Number</label>
+              <input type="text" id="new-cust-phone" placeholder="e.g. +91 98220 00000" required class="w-full bg-white border border-slate-300 rounded-lg text-xs p-2.5">
+            </div>
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-slate-700 mb-1">GSTIN Number</label>
+            <input type="text" id="new-cust-gst" placeholder="e.g. 27AAACG9912K1Z5" required class="w-full bg-white border border-slate-300 rounded-lg text-xs p-2.5 font-mono">
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-slate-700 mb-1">Farm / Delivery Address</label>
+            <textarea id="new-cust-address" rows="2" placeholder="e.g. Gat 42, Pune-Nashik Highway, Sangamner" required class="w-full bg-white border border-slate-300 rounded-lg text-xs p-2.5"></textarea>
+          </div>
+          <div class="flex justify-end space-x-2 pt-2 border-t border-slate-200">
+            <button type="button" onclick="closeFormModal()" class="px-3.5 py-2 border border-slate-300 rounded-lg text-xs font-semibold text-slate-700 hover:bg-slate-50">Cancel</button>
+            <button type="submit" class="px-4 py-2 bg-slate-900 hover:bg-black text-white rounded-lg text-xs font-semibold">Save Customer</button>
+          </div>
+        </form>
+      `;
+
+      backdrop.classList.remove('hidden');
+      lucide.createIcons();
+    }
+
+    function saveCustomerForm(e, nextId) {
+      e.preventDefault();
+      db.customers.push({
+        id: nextId,
+        name: document.getElementById('new-cust-name').value,
+        contactPerson: document.getElementById('new-cust-person').value,
+        phone: document.getElementById('new-cust-phone').value,
+        gstin: document.getElementById('new-cust-gst').value,
+        address: document.getElementById('new-cust-address').value
+      });
+
+      saveDb();
+      closeFormModal();
+      showNotification(`Customer ${nextId} registered.`);
+      navigateTo('customers');
+    }
+
+    function openNewPOModal() {
+      const backdrop = document.getElementById('form-modal-backdrop');
+      const box = document.getElementById('form-modal-box');
+      const nextId = getNextSequentialId('PO', db.pos);
+
+      box.innerHTML = `
+        <div class="h-14 px-5 border-b border-slate-200 flex items-center justify-between bg-white flex-shrink-0">
+          <h3 class="font-bold text-slate-900 text-sm">Issue Purchase Order (${nextId})</h3>
+          <button onclick="closeFormModal()" class="p-1 text-slate-400 hover:text-slate-800 rounded">
+            <i data-lucide="x" class="w-4 h-4"></i>
+          </button>
+        </div>
+
+        <form onsubmit="savePOForm(event, '${nextId}')" class="p-5 overflow-y-auto space-y-4">
+          <div class="grid grid-cols-2 gap-3">
+            <div>
+              <label class="block text-xs font-semibold text-slate-700 mb-1">Vendor / Supplier Name</label>
+              <input type="text" id="po-vendor-name" placeholder="e.g. SKF Bearings Hub" required class="w-full bg-white border border-slate-300 rounded-lg text-xs p-2.5">
+            </div>
+            <div>
+              <label class="block text-xs font-semibold text-slate-700 mb-1">Vendor GSTIN</label>
+              <input type="text" id="po-vendor-gst" placeholder="e.g. 27AAACK1122P1Z0" required class="w-full bg-white border border-slate-300 rounded-lg text-xs p-2.5 font-mono">
+            </div>
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-slate-700 mb-1">Raw Material Specification</label>
+            <input type="text" id="po-item-name" placeholder="e.g. 6mm MS Steel Plates for Hammer Mill body" required class="w-full bg-white border border-slate-300 rounded-lg text-xs p-2.5">
+          </div>
+          <div class="grid grid-cols-3 gap-3">
+            <div>
+              <label class="block text-xs font-semibold text-slate-700 mb-1">Qty</label>
+              <input type="number" id="po-qty" value="10" min="1" required class="w-full bg-white border border-slate-300 rounded-lg text-xs p-2.5">
+            </div>
+            <div>
+              <label class="block text-xs font-semibold text-slate-700 mb-1">Rate (₹)</label>
+              <input type="number" id="po-rate" value="5000" min="1" required class="w-full bg-white border border-slate-300 rounded-lg text-xs p-2.5 font-bold">
+            </div>
+            <div>
+              <label class="block text-xs font-semibold text-slate-700 mb-1">GST Rate (%)</label>
+              <input type="number" id="po-gst" value="18" min="0" max="28" required class="w-full bg-white border border-slate-300 rounded-lg text-xs p-2.5 font-bold">
+            </div>
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-slate-700 mb-1">Expected Delivery Date</label>
+            <input type="date" id="po-delivery-date" value="${new Date(Date.now() + 7 * 86400000).toISOString().split('T')[0]}" required class="w-full bg-white border border-slate-300 rounded-lg text-xs p-2.5">
+          </div>
+          <div class="flex justify-end space-x-2 pt-2 border-t border-slate-200">
+            <button type="button" onclick="closeFormModal()" class="px-3.5 py-2 border border-slate-300 rounded-lg text-xs font-semibold text-slate-700 hover:bg-slate-50">Cancel</button>
+            <button type="submit" class="px-4 py-2 bg-slate-900 hover:bg-black text-white rounded-lg text-xs font-semibold">Issue PO</button>
+          </div>
+        </form>
+      `;
+
+      backdrop.classList.remove('hidden');
+      lucide.createIcons();
+    }
+
+    function savePOForm(e, nextId) {
+      e.preventDefault();
+      const rate = Number(document.getElementById('po-rate').value) || 0;
+      const qty = Number(document.getElementById('po-qty').value) || 1;
+      const gstr = Number(document.getElementById('po-gst').value) || 18;
+
+      const taxable = rate * qty;
+      const gstAmount = Math.round(taxable * (gstr / 100));
+      const grandTotal = taxable + gstAmount;
+
+      db.pos.push({
+        id: nextId,
+        date: new Date().toISOString().split('T')[0],
+        vendorName: document.getElementById('po-vendor-name').value,
+        vendorAddress: 'Industrial Zone, Nashik',
+        vendorGst: document.getElementById('po-vendor-gst').value,
+        items: [
+          { name: document.getElementById('po-item-name').value, hsn: '7208', qty, price: rate, taxable, gstRate: gstr, gstAmount, total: grandTotal }
+        ],
+        taxableSubtotal: taxable,
+        cgst: Math.round(gstAmount / 2),
+        sgst: Math.round(gstAmount / 2),
+        totalGst: gstAmount,
+        grandTotal,
+        deliveryDate: document.getElementById('po-delivery-date').value,
+        status: 'Ordered'
+      });
+
+      saveDb();
+      closeFormModal();
+      showNotification(`Purchase Order ${nextId} saved.`);
+      navigateTo('pos');
+    }
+
+    function openNewExpenseModal() {
+      const backdrop = document.getElementById('form-modal-backdrop');
+      const box = document.getElementById('form-modal-box');
+      const nextId = getNextSequentialId('EXP', db.expenses);
+
+      box.innerHTML = `
+        <div class="h-14 px-5 border-b border-slate-200 flex items-center justify-between bg-white flex-shrink-0">
+          <h3 class="font-bold text-slate-900 text-sm">Log Workshop Expense (${nextId})</h3>
+          <button onclick="closeFormModal()" class="p-1 text-slate-400 hover:text-slate-800 rounded">
+            <i data-lucide="x" class="w-4 h-4"></i>
+          </button>
+        </div>
+
+        <form onsubmit="saveExpenseForm(event, '${nextId}')" class="p-5 overflow-y-auto space-y-4">
+          <div class="grid grid-cols-2 gap-3">
+            <div>
+              <label class="block text-xs font-semibold text-slate-700 mb-1">Expense Category</label>
+              <select id="exp-category" class="w-full bg-white border border-slate-300 rounded-lg text-xs p-2.5">
+                <option value="Lathe & CNC Turning">Lathe & CNC Turning</option>
+                <option value="Factory Electricity">Factory Electricity</option>
+                <option value="Welding & Gas">Welding & Gas</option>
+                <option value="Transport & Freight">Transport & Freight</option>
+                <option value="Workshop Consumables">Workshop Consumables</option>
+                <option value="Labour Charges">Labour Charges</option>
+              </select>
+            </div>
+            <div>
+              <label class="block text-xs font-semibold text-slate-700 mb-1">Payment Method</label>
+              <select id="exp-pay-method" class="w-full bg-white border border-slate-300 rounded-lg text-xs p-2.5">
+                <option value="UPI">UPI</option>
+                <option value="Cash">Cash</option>
+                <option value="Net Banking">Net Banking</option>
+                <option value="Cheque">Cheque</option>
+              </select>
+            </div>
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-slate-700 mb-1">Detailed Description</label>
+            <input type="text" id="exp-desc" placeholder="e.g. Plasma sheet cutting charges" required class="w-full bg-white border border-slate-300 rounded-lg text-xs p-2.5">
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-slate-700 mb-1">Amount Paid (₹)</label>
+            <input type="number" id="exp-amount" min="1" required class="w-full bg-white border border-slate-300 rounded-lg text-xs p-2.5 font-bold">
+          </div>
+          <div class="flex justify-end space-x-2 pt-2 border-t border-slate-200">
+            <button type="button" onclick="closeFormModal()" class="px-3.5 py-2 border border-slate-300 rounded-lg text-xs font-semibold text-slate-700 hover:bg-slate-50">Cancel</button>
+            <button type="submit" class="px-4 py-2 bg-slate-900 hover:bg-black text-white rounded-lg text-xs font-semibold">Log Expense</button>
+          </div>
+        </form>
+      `;
+
+      backdrop.classList.remove('hidden');
+      lucide.createIcons();
+    }
+
+    function saveExpenseForm(e, nextId) {
+      e.preventDefault();
+      db.expenses.push({
+        id: nextId,
+        date: new Date().toISOString().split('T')[0],
+        category: document.getElementById('exp-category').value,
+        description: document.getElementById('exp-desc').value,
+        amount: Number(document.getElementById('exp-amount').value) || 0,
+        method: document.getElementById('exp-pay-method').value
+      });
+
+      saveDb();
+      closeFormModal();
+      showNotification(`Expense ${nextId} logged.`);
+      navigateTo('expenses');
+    }
+
+    function closeFormModal() {
+      document.getElementById('form-modal-backdrop').classList.add('hidden');
+    }
+
+    /* ------------------------------------------------------------------
+       7. ROCK-SOLID A4 DOCUMENT PREVIEW & PRINT ENGINE (CLEAN & COMPLETE)
+       ------------------------------------------------------------------ */
+    function previewDocument(type, id) {
+      const container = document.getElementById('printable-doc-sheet');
+      const comp = db.company;
+
+      if (type === 'quotation' || type === 'so' || type === 'invoice') {
+        let doc = null;
+        let docTitle = '';
+        let badgeColor = '';
+        let isInvoice = false;
+        let isSo = false;
+
+        if (type === 'quotation') {
+          doc = db.quotations.find(q => q.id === id);
+          docTitle = 'ESTIMATE / QUOTATION';
+          badgeColor = 'bg-slate-800';
+        } else if (type === 'so') {
+          doc = db.salesOrders.find(s => s.id === id);
+          docTitle = 'SALES ORDER';
+          badgeColor = 'bg-blue-900';
+          isSo = true;
+        } else if (type === 'invoice') {
+          doc = db.invoices.find(i => i.id === id);
+          docTitle = 'TAX INVOICE';
+          badgeColor = 'bg-slate-900';
+          isInvoice = true;
+        }
+
+        if (!doc) return;
+
+        const cust = db.customers.find(c => c.id === doc.customerId) || {
+          name: doc.customerName,
+          address: 'Maharashtra, India',
+          gstin: 'N/A',
+          phone: '-'
+        };
+
+        const fin = (isInvoice || isSo) ? getDocumentFinancials(doc.id) : null;
+
+        container.innerHTML = `
+          <div class="space-y-6">
+            
+            <!-- Letterhead Section -->
+            <div class="flex justify-between items-start pb-5 border-b-2 border-slate-900">
+              <div class="max-w-md">
+                <h1 class="text-xl font-bold tracking-tight text-slate-950 uppercase">${comp.name}</h1>
+                <p class="text-[11px] font-semibold text-slate-700 mt-0.5">${comp.tagline}</p>
+                <p class="text-[11px] text-slate-600 mt-1 leading-snug">${comp.address}</p>
+                <div class="mt-2 text-[11px] text-slate-800 flex flex-wrap gap-x-4 gap-y-1">
+                  <span><strong>GSTIN:</strong> ${comp.gstin}</span>
+                  <span><strong>PAN:</strong> ${comp.pan}</span>
+                  <span><strong>Phone:</strong> ${comp.phone}</span>
+                </div>
+              </div>
+
+              <div class="text-right flex flex-col items-end">
+                <span class="inline-block px-3 py-1 ${badgeColor} text-white font-bold text-xs uppercase tracking-wider rounded font-mono mb-2">
+                  ${docTitle}
+                </span>
+                <p class="text-base font-black font-mono text-slate-900">${doc.id}</p>
+                <p class="text-xs text-slate-600 mt-1">Date: <strong>${formatDate(doc.date)}</strong></p>
+                ${doc.deliveryDate ? `<p class="text-xs text-slate-600">Delivery Date: <strong>${formatDate(doc.deliveryDate)}</strong></p>` : ''}
+                ${doc.dueDate ? `<p class="text-xs text-slate-600">Payment Due: <strong>${formatDate(doc.dueDate)}</strong></p>` : ''}
+              </div>
+            </div>
+
+            <!-- Billed / Shipped Customer Grid -->
+            <div class="grid grid-cols-2 gap-4 bg-slate-50 p-4 rounded-lg border border-slate-200">
+              <div>
+                <p class="text-[10px] uppercase font-bold text-slate-400 tracking-wider mb-1">Customer Details</p>
+                <p class="font-bold text-slate-900 text-sm">${cust.name}</p>
+                <p class="text-slate-600 text-xs mt-0.5 leading-relaxed">${cust.address}</p>
+                <p class="text-slate-700 text-xs mt-1"><strong>GSTIN:</strong> <span class="font-mono">${cust.gstin}</span></p>
+                <p class="text-slate-700 text-xs"><strong>Contact:</strong> ${cust.phone}</p>
+              </div>
+              <div class="border-l border-slate-200 pl-4 flex flex-col justify-between">
+                <div>
+                  <p class="text-[10px] uppercase font-bold text-slate-400 tracking-wider mb-1">Supply & Dispatch Details</p>
+                  <p class="text-xs text-slate-700"><strong>Place of Supply:</strong> Maharashtra (27)</p>
+                  <p class="text-xs text-slate-700 mt-1"><strong>Transport:</strong> Dedicated Freight Vehicle</p>
+                  ${doc.quotationId ? `<p class="text-xs text-slate-700 mt-1 font-mono"><strong>Quotation Ref:</strong> ${doc.quotationId}</p>` : ''}
+                  ${doc.soId ? `<p class="text-xs text-slate-700 mt-1 font-mono"><strong>Sales Order Ref:</strong> ${doc.soId}</p>` : ''}
+                </div>
+                ${fin ? `
+                  <div class="pt-2">
+                    <span class="text-[10px] uppercase font-bold text-slate-400 block mb-0.5">Payment Status</span>
+                    ${renderStatusPill(fin.status, fin.remainingBalance)}
+                  </div>
+                ` : ''}
+              </div>
+            </div>
+
+            <!-- Line Items Specification Table -->
+            <table class="w-full text-left text-xs border border-slate-300 border-collapse">
+              <thead class="bg-slate-100 text-slate-800 uppercase font-semibold text-[10px]">
+                <tr>
+                  <th class="p-2 border border-slate-300 text-center w-8">#</th>
+                  <th class="p-2 border border-slate-300">Poultry Machinery Description</th>
+                  <th class="p-2 border border-slate-300 text-center w-16">HSN</th>
+                  <th class="p-2 border border-slate-300 text-center w-12">Qty</th>
+                  <th class="p-2 border border-slate-300 text-right w-24">Rate (₹)</th>
+                  <th class="p-2 border border-slate-300 text-right w-24">Taxable (₹)</th>
+                  <th class="p-2 border border-slate-300 text-center w-14">GST %</th>
+                  <th class="p-2 border border-slate-300 text-right w-28">Total (₹)</th>
+                </tr>
+              </thead>
+              <tbody>
+                ${doc.items.map((item, index) => `
+                  <tr class="hover:bg-slate-50/50">
+                    <td class="p-2 border border-slate-300 text-center">${index + 1}</td>
+                    <td class="p-2 border border-slate-300">
+                      <p class="font-bold text-slate-900">${item.name}</p>
+                      ${item.specs ? `<p class="text-[10px] text-slate-500">${item.specs}</p>` : ''}
+                    </td>
+                    <td class="p-2 border border-slate-300 text-center font-mono">${item.hsn}</td>
+                    <td class="p-2 border border-slate-300 text-center font-bold">${item.qty}</td>
+                    <td class="p-2 border border-slate-300 text-right">${formatCurrency(item.price)}</td>
+                    <td class="p-2 border border-slate-300 text-right font-medium">${formatCurrency(item.taxable || (item.price * item.qty))}</td>
+                    <td class="p-2 border border-slate-300 text-center font-semibold text-slate-700">${item.gstRate || 18}%</td>
+                    <td class="p-2 border border-slate-300 text-right font-bold text-slate-900">${formatCurrency(item.total)}</td>
+                  </tr>
+                `).join('')}
+              </tbody>
+            </table>
+
+            <!-- Financial Summary & Bank Information -->
+            <div class="grid grid-cols-2 gap-4 items-start pt-2">
+              <div class="p-3.5 bg-slate-50 border border-slate-200 rounded-lg text-xs space-y-1">
+                <p class="font-bold text-slate-900 uppercase text-[10px] tracking-wide mb-1.5 flex items-center">
+                  <i data-lucide="building" class="w-3.5 h-3.5 mr-1 text-slate-700"></i>
+                  Bank Wire / RTGS Settlement Details
+                </p>
+                <p class="text-slate-600">Bank Name: <strong class="text-slate-900">${comp.bankName}</strong></p>
+                <p class="text-slate-600">Account No: <strong class="text-slate-900 font-mono">${comp.accountNo}</strong></p>
+                <p class="text-slate-600">IFSC Code: <strong class="text-slate-900 font-mono">${comp.ifscCode}</strong></p>
+                <p class="text-slate-600">Branch: <span class="text-slate-800">${comp.branch}</span></p>
+                <p class="text-slate-600">UPI ID: <span class="text-slate-900 font-mono font-medium">${comp.upiId}</span></p>
+              </div>
+
+              <div class="bg-slate-50 p-3.5 border border-slate-200 rounded-lg space-y-1.5 text-xs">
+                <div class="flex justify-between text-slate-600">
+                  <span>Taxable Subtotal:</span>
+                  <span class="font-semibold text-slate-800">${formatCurrency(doc.taxableSubtotal)}</span>
+                </div>
+                <div class="flex justify-between text-slate-600">
+                  <span>CGST (Central Tax):</span>
+                  <span>${formatCurrency(doc.cgst || Math.round(doc.totalGst / 2))}</span>
+                </div>
+                <div class="flex justify-between text-slate-600">
+                  <span>SGST (State Tax):</span>
+                  <span>${formatCurrency(doc.sgst || Math.round(doc.totalGst / 2))}</span>
+                </div>
+                <div class="flex justify-between pt-1.5 border-t border-slate-300 font-bold text-slate-900 text-sm">
+                  <span>Grand Total Amount:</span>
+                  <span class="text-emerald-700 font-mono">${formatCurrency(doc.grandTotal)}</span>
+                </div>
+                ${fin ? `
+                  <div class="flex justify-between pt-1 border-t border-slate-200 text-slate-700">
+                    <span>Total Amount Paid:</span>
+                    <span class="font-bold text-emerald-600">${formatCurrency(fin.totalPaid)}</span>
+                  </div>
+                  <div class="flex justify-between font-bold text-xs pt-1 ${fin.remainingBalance > 0 ? 'text-amber-700 bg-amber-50 p-1.5 rounded border border-amber-200' : 'text-slate-500'}">
+                    <span>Remaining Balance Due:</span>
+                    <span class="font-mono text-sm">${formatCurrency(fin.remainingBalance)}</span>
+                  </div>
+                ` : ''}
+              </div>
+            </div>
+
+            <!-- Standard Machinery Terms and Authorized Signatory -->
+            <div class="pt-6 border-t border-slate-200 grid grid-cols-2 gap-4 items-end">
+              <div class="text-[10px] text-slate-500 space-y-0.5">
+                <p class="font-bold text-slate-700 uppercase tracking-wider mb-1">Standard Machinery Terms:</p>
+                <p>1. Warranty: 12 months guarantee for main shafts, rotors & bearings against mfg defects.</p>
+                <p>2. Payment: Advance booking as specified; balance strictly prior to factory dispatch.</p>
+                <p>3. Jurisdiction: All disputes subject to Nashik jurisdiction only.</p>
+              </div>
+
+              <div class="text-center flex flex-col items-end">
+                <p class="text-xs font-bold text-slate-900 mb-12">For AVS Agro Engineers</p>
+                <div class="w-44 border-t border-slate-400 pt-1 text-center">
+                  <p class="text-[11px] text-slate-600 font-medium">Authorized Signatory</p>
+                </div>
+              </div>
+            </div>
+
+          </div>
+        `;
+      } else if (type === 'receipt') {
+        const p = db.payments.find(item => item.id === id);
+        if (!p) return;
+
+        container.innerHTML = `
+          <div class="space-y-6">
+            <div class="flex justify-between items-start pb-5 border-b-2 border-emerald-800">
+              <div>
+                <h1 class="text-xl font-bold tracking-tight text-slate-950 uppercase">${comp.name}</h1>
+                <p class="text-[11px] font-semibold text-slate-700 mt-0.5">${comp.tagline}</p>
+                <p class="text-[11px] text-slate-600 mt-1">${comp.address}</p>
+                <p class="text-[11px] text-slate-800 mt-1"><strong>GSTIN:</strong> ${comp.gstin}</p>
+              </div>
+
+              <div class="text-right">
+                <span class="inline-block px-3 py-1 bg-emerald-700 text-white font-bold text-xs uppercase tracking-wider rounded font-mono mb-2">
+                  OFFICIAL RECEIPT
+                </span>
+                <p class="text-base font-black font-mono text-slate-900">${p.id}</p>
+                <p class="text-xs text-slate-600 mt-1">Receipt Date: <strong>${formatDate(p.date)}</strong></p>
+              </div>
+            </div>
+
+            <div class="bg-slate-50 p-5 rounded-lg border border-slate-200 space-y-3 text-xs">
+              <p class="text-slate-700">
+                Received with thanks from: <strong class="text-slate-900 text-sm font-bold block mt-1">${p.customerName}</strong>
+              </p>
+
+              <div class="grid grid-cols-2 gap-4 pt-3 border-t border-slate-200">
+                <div>
+                  <span class="text-slate-500 block text-[11px]">Against Order / Invoice Ref:</span>
+                  <span class="font-mono font-bold text-slate-800 text-sm">${p.docId}</span>
+                </div>
+                <div>
+                  <span class="text-slate-500 block text-[11px]">Payment Mode:</span>
+                  <span class="font-bold text-slate-800 text-sm">${p.method}</span>
+                </div>
+              </div>
+
+              <div class="pt-2 border-t border-slate-200">
+                <span class="text-slate-500 block text-[11px]">Transaction UTR / Cheque Ref:</span>
+                <span class="font-mono font-bold text-slate-900 text-xs">${p.refNo || '-'}</span>
+              </div>
+
+              ${p.notes ? `
+                <div class="pt-2 border-t border-slate-200">
+                  <span class="text-slate-500 block text-[11px]">Notes:</span>
+                  <span class="text-slate-700">${p.notes}</span>
+                </div>
+              ` : ''}
+            </div>
+
+            <div class="bg-emerald-50 border border-emerald-300 p-4 rounded-lg flex justify-between items-center">
+              <div>
+                <span class="font-bold text-emerald-900 text-xs uppercase tracking-wider block">Total Amount Received (INR)</span>
+                <span class="text-[11px] text-emerald-700">Payment credited & verified</span>
+              </div>
+              <span class="text-2xl font-black text-emerald-700 font-mono">${formatCurrency(p.amount)}</span>
+            </div>
+
+            <div class="pt-8 border-t border-slate-200 flex justify-between items-end">
+              <p class="text-[10px] text-slate-400">Computer generated official acknowledgment receipt.</p>
+              <div class="text-center">
+                <p class="text-xs font-bold text-slate-900 mb-12">For AVS Agro Engineers</p>
+                <div class="w-40 border-t border-slate-400 pt-1">
+                  <p class="text-[11px] text-slate-500">Accounts Department</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        `;
+      } else if (type === 'po') {
+        const po = db.pos.find(item => item.id === id);
+        if (!po) return;
+
+        container.innerHTML = `
+          <div class="space-y-6">
+            <div class="flex justify-between items-start pb-5 border-b-2 border-slate-900">
+              <div>
+                <h1 class="text-xl font-bold tracking-tight text-slate-950 uppercase">${comp.name}</h1>
+                <p class="text-[11px] font-semibold text-slate-700 mt-0.5">Procurement & Stores Department</p>
+                <p class="text-[11px] text-slate-600 mt-1">${comp.address}</p>
+                <p class="text-[11px] text-slate-800 mt-1"><strong>GSTIN:</strong> ${comp.gstin}</p>
+              </div>
+
+              <div class="text-right">
+                <span class="inline-block px-3 py-1 bg-slate-900 text-white font-bold text-xs uppercase tracking-wider rounded font-mono mb-2">
+                  PURCHASE ORDER
+                </span>
+                <p class="text-base font-black font-mono text-slate-900">${po.id}</p>
+                <p class="text-xs text-slate-600 mt-1">Date: <strong>${formatDate(po.date)}</strong></p>
+                <p class="text-xs text-slate-600">Expected Delivery: <strong>${formatDate(po.deliveryDate)}</strong></p>
+              </div>
+            </div>
+
+            <div class="bg-slate-50 p-4 rounded-lg border border-slate-200 text-xs">
+              <p class="text-[10px] uppercase font-bold text-slate-400 tracking-wider mb-1">Approved Vendor / Supplier</p>
+              <p class="font-bold text-slate-900 text-sm">${po.vendorName}</p>
+              <p class="text-slate-600 mt-0.5">${po.vendorAddress || 'MIDC Industrial Area'}</p>
+              <p class="text-slate-700 mt-1"><strong>GSTIN:</strong> <span class="font-mono">${po.vendorGst}</span></p>
+            </div>
+
+            <table class="w-full text-left text-xs border border-slate-300 border-collapse">
+              <thead class="bg-slate-100 text-slate-800 uppercase font-semibold text-[10px]">
+                <tr>
+                  <th class="p-2 border border-slate-300 text-center w-8">#</th>
+                  <th class="p-2 border border-slate-300">Raw Material Specification</th>
+                  <th class="p-2 border border-slate-300 text-center w-16">HSN</th>
+                  <th class="p-2 border border-slate-300 text-center w-12">Qty</th>
+                  <th class="p-2 border border-slate-300 text-right w-24">Rate (₹)</th>
+                  <th class="p-2 border border-slate-300 text-center w-14">GST %</th>
+                  <th class="p-2 border border-slate-300 text-right w-28">Total (₹)</th>
+                </tr>
+              </thead>
+              <tbody>
+                ${po.items.map((item, index) => `
+                  <tr>
+                    <td class="p-2 border border-slate-300 text-center">${index + 1}</td>
+                    <td class="p-2 border border-slate-300 font-medium">${item.name}</td>
+                    <td class="p-2 border border-slate-300 text-center font-mono">${item.hsn}</td>
+                    <td class="p-2 border border-slate-300 text-center font-bold">${item.qty}</td>
+                    <td class="p-2 border border-slate-300 text-right">${formatCurrency(item.price)}</td>
+                    <td class="p-2 border border-slate-300 text-center font-semibold text-slate-700">${item.gstRate}%</td>
+                    <td class="p-2 border border-slate-300 text-right font-bold text-slate-900">${formatCurrency(item.total)}</td>
+                  </tr>
+                `).join('')}
+              </tbody>
+            </table>
+
+            <div class="flex justify-end pt-2">
+              <div class="w-64 bg-slate-50 p-3.5 border border-slate-200 rounded-lg text-xs space-y-1">
+                <div class="flex justify-between text-slate-600">
+                  <span>Taxable Subtotal:</span>
+                  <span class="font-semibold text-slate-800">${formatCurrency(po.taxableSubtotal)}</span>
+                </div>
+                <div class="flex justify-between text-slate-600">
+                  <span>GST Amount:</span>
+                  <span>${formatCurrency(po.totalGst)}</span>
+                </div>
+                <div class="flex justify-between pt-1 border-t border-slate-300 font-bold text-slate-900 text-sm">
+                  <span>Total PO Amount:</span>
+                  <span class="text-slate-900 font-mono">${formatCurrency(po.grandTotal)}</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="pt-8 border-t border-slate-200 flex justify-between items-end">
+              <p class="text-[10px] text-slate-400">Deliver with Test Certificate (TC) to MIDC Ambad workshop.</p>
+              <div class="text-center">
+                <p class="text-xs font-bold text-slate-900 mb-12">For AVS Agro Engineers</p>
+                <div class="w-40 border-t border-slate-400 pt-1">
+                  <p class="text-[11px] text-slate-500">Purchase Manager</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        `;
+      }
+
+      document.getElementById('print-modal-container').classList.remove('hidden');
+      lucide.createIcons();
+    }
+
+    function closeDocPreview() {
+      document.getElementById('print-modal-container').classList.add('hidden');
+    }
+
+    /* ------------------------------------------------------------------
+       8. INITIALIZATION LIFECYCLE
+       ------------------------------------------------------------------ */
+    window.addEventListener('DOMContentLoaded', () => {
+      initDb();
+      renderSidebarNav();
+      renderActiveView();
+    });
+  </script>
+</body>
+</html>
